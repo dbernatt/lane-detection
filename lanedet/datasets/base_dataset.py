@@ -9,7 +9,7 @@ import logging
 from lanedet.utils.visualization import imshow_lanes
 
 class BaseDataset(Dataset):
-    def __init__(self, data_root, split, processes=None, cfg=None):
+    def __init__(self, data_root, split, cfg=None):
         self.cfg = cfg
         self.logger = logging.getLogger(__name__)
         self.data_root = data_root
@@ -52,10 +52,10 @@ class BaseDataset(Dataset):
                     new_lanes.append(lanes)
                 sample.update({'lanes': new_lanes})
 
-        sample = self.processes(sample)
+        # sample = self.processes(sample)
         meta = {'full_img_path': data_info['img_path'],
                 'img_name': data_info['img_name']}
-        meta = DC(meta, cpu_only=True)
+        # meta = DC(meta, cpu_only=True)
         sample.update({'meta': meta})
 
         return sample

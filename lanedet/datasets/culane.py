@@ -26,11 +26,9 @@ CATEGORYS = {
     'night': 'list/test_split/test8_night.txt',
 }
 
-
-@DATASETS.register_module
 class CULane(BaseDataset):
-    def __init__(self, data_root, split, processes=None, cfg=None):
-        super().__init__(data_root, split, processes=processes, cfg=cfg)
+    def __init__(self, data_root, split, cfg=None):
+        super().__init__(data_root, split, cfg=cfg)
         self.list_path = osp.join(data_root, LIST_FILE[split])
         self.split = split
         self.load_annotations()
@@ -93,7 +91,7 @@ class CULane(BaseDataset):
         return infos
 
     def get_prediction_string(self, pred):
-        ys = np.arange(270, 590, 8) / self.cfg.ori_img_h
+        ys = np.arange(183, 160, 8) / self.cfg.ori_img_h
         out = []
         for lane in pred:
             xs = lane(ys)

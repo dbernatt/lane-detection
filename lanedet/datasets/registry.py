@@ -1,0 +1,48 @@
+from lanedet.utils import Registry, build_from_cfg
+
+import torch
+from torch import nn
+from torch.utils.data import DataLoader
+from functools import partial
+import numpy as np
+import random
+# from mmcv.parallel import collate
+
+def build(cfg, default_args=None):
+    if isinstance(cfg, list):
+        modules = [
+            build_from_cfg(cfg_, default_args) for cfg_ in cfg
+        ]
+        return nn.Sequential(*modules)
+    else:
+        return build_from_cfg(cfg, default_args)
+
+
+def build_dataset(split_cfg, cfg):
+    return build(split_cfg, default_args=dict(cfg=cfg))
+
+
+def worker_init_fn(worker_id, seed):
+    worker_seed = worker_id + seed
+    np.random.seed(worker_seed)
+    random.seed(worker_seed)
+
+
+def build_dataloader(split_cfg, cfg, is_train=True):
+    if is_train:
+        shuffle = True
+    else:
+        shuffle = False
+
+    dataset = build_dataset(split_cfg, cfg)
+
+    data_loader = DataLoader(
+        dataset,
+        batch_size=cfg.batch_size,
+        shuffle=shuffle,
+        num_workers=cfg.workers,
+        pin_memory=False,
+        drop_last=False,
+    )
+
+    return data_loader
