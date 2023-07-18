@@ -104,13 +104,13 @@ dataset = dict(train=dict(
     split='train',
     processes=train_process,
 ),
-val=dict(
+    val=dict(
     type=dataset_type,
     data_root=dataset_path,
     split='test',
     processes=val_process,
 ),
-test=dict(
+    test=dict(
     type=dataset_type,
     data_root=dataset_path,
     split='test',

@@ -8,6 +8,7 @@ import torchvision
 import logging
 from lanedet.utils.visualization import imshow_lanes
 
+
 class BaseDataset(Dataset):
     def __init__(self, data_root, split, cfg=None):
         self.cfg = cfg

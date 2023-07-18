@@ -24,7 +24,7 @@ class Runner(nn.Module):
         max_iter = len(train_loader)
         for i, data in enumerate(train_loader):
             output = self.net(data)
-            
+
             self.optimizer.zero_grad()
             loss = output['loss'].sum()
             loss.backward()
@@ -41,7 +41,7 @@ class Runner(nn.Module):
 
         print('Start training...')
         start_epoch = 0
-        
+
         for epoch in range(start_epoch, self.cfg.epochs):
             self.train_epoch(epoch, train_loader)
             if (epoch +

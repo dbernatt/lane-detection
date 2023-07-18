@@ -26,6 +26,7 @@ CATEGORYS = {
     'night': 'list/test_split/test8_night.txt',
 }
 
+
 class CULane(BaseDataset):
     def __init__(self, data_root, split, cfg=None):
         super().__init__(data_root, split, cfg=cfg)
@@ -50,7 +51,7 @@ class CULane(BaseDataset):
             for line in list_file:
                 infos = self.load_annotation(line.split())
                 self.data_infos.append(infos)
-        
+
         # cache data infos to file
         with open(cache_path, 'wb') as cache_file:
             pkl.dump(self.data_infos, cache_file)
@@ -72,7 +73,8 @@ class CULane(BaseDataset):
             exist_list = [int(l) for l in line[2:]]
             infos['lane_exist'] = np.array(exist_list)
 
-        anno_path = img_path[:-3] + 'lines.txt'  # remove sufix jpg and add lines.txt
+        # remove sufix jpg and add lines.txt
+        anno_path = img_path[:-3] + 'lines.txt'
         with open(anno_path, 'r') as anno_file:
             data = [
                 list(map(float, line.split()))
@@ -127,14 +129,16 @@ class CULane(BaseDataset):
         for cate, cate_file in CATEGORYS.items():
             result = culane_metric.eval_predictions(output_basedir,
                                                     self.data_root,
-                                                    os.path.join(self.data_root, cate_file),
+                                                    os.path.join(
+                                                        self.data_root, cate_file),
                                                     iou_thresholds=[0.5],
                                                     official=True)
 
         result = culane_metric.eval_predictions(output_basedir,
                                                 self.data_root,
                                                 self.list_path,
-                                                iou_thresholds=np.linspace(0.5, 0.95, 10),
+                                                iou_thresholds=np.linspace(
+                                                    0.5, 0.95, 10),
                                                 official=True)
 
         return result[0.5]['F1']

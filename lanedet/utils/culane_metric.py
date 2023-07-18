@@ -133,6 +133,7 @@ def load_culane_data(data_dir, file_list_path):
 
     return data
 
+
 def eval_predictions(pred_dir,
                      anno_dir,
                      list_path,
@@ -158,10 +159,10 @@ def eval_predictions(pred_dir,
         from itertools import repeat
         with Pool(cpu_count()) as p:
             results = p.starmap(culane_metric, zip(predictions, annotations,
-                        repeat(width),
-                        repeat(iou_thresholds),
-                        repeat(official),
-                        repeat(img_shape)))
+                                                   repeat(width),
+                                                   repeat(iou_thresholds),
+                                                   repeat(official),
+                                                   repeat(img_shape)))
 
     mean_f1, mean_prec, mean_recall, total_tp, total_fp, total_fn = 0, 0, 0, 0, 0, 0
     ret = {}
@@ -171,10 +172,10 @@ def eval_predictions(pred_dir,
         fn = sum(m[thr][2] for m in results)
         precision = float(tp) / (tp + fp) if tp != 0 else 0
         recall = float(tp) / (tp + fn) if tp != 0 else 0
-        f1 = 2 * precision * recall / (precision + recall) if tp !=0 else 0
+        f1 = 2 * precision * recall / (precision + recall) if tp != 0 else 0
         logger.info('iou thr: {:.2f}, tp: {}, fp: {}, fn: {},'
-                'precision: {}, recall: {}, f1: {}'.format(
-            thr, tp, fp, fn, precision, recall, f1))
+                    'precision: {}, recall: {}, f1: {}'.format(
+                        thr, tp, fp, fn, precision, recall, f1))
         mean_f1 += f1 / len(iou_thresholds)
         mean_prec += precision / len(iou_thresholds)
         mean_recall += recall / len(iou_thresholds)
@@ -191,8 +192,8 @@ def eval_predictions(pred_dir,
         }
     if len(iou_thresholds) > 2:
         logger.info('mean result, total_tp: {}, total_fp: {}, total_fn: {},'
-                'precision: {}, recall: {}, f1: {}'.format(total_tp, total_fp,
-            total_fn, mean_prec, mean_recall, mean_f1))
+                    'precision: {}, recall: {}, f1: {}'.format(total_tp, total_fp,
+                                                               total_fn, mean_prec, mean_recall, mean_f1))
         ret['mean'] = {
             'TP': total_tp,
             'FP': total_fp,

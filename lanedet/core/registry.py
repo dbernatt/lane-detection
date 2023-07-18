@@ -1,5 +1,6 @@
-from torch import nn 
+from torch import nn
 from lanedet.utils import Registry, build_from_cfg
+
 
 def build(cfg, default_args=None):
     if isinstance(cfg, list):

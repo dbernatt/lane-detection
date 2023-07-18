@@ -1,14 +1,18 @@
 import argparse
+import pytorch_lightning as pl
 from lanedet.utils import Config
 from lanedet.core.runner import Runner
 from lanedet.datasets.registry import build_dataloader
-import pytorch_lightning as pl
 
 
 def main():
     args = parse_args()
+    print('args: ', args)
+    print('args.config: ', args.config)
     cfg = Config.fromfile(args.config)
+    print('cfg: ', cfg._)
     cfg.work_dirs = args.work_dirs if args.work_dirs else cfg.work_dirs
+    return
 
     runner = Runner(cfg)
     trainer = pl.Trainer(fast_dev_run=True, max_epochs=cfg.epochs)
@@ -18,7 +22,8 @@ def main():
     elif args.test:
         raise NotImplementedError('Test is not implemented yet.')
     else:
-        trainer.fit(runner)
+        runner.train(cfg)
+        # trainer.fit(runner)
 
 
 def parse_args():

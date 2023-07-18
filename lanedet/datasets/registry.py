@@ -8,6 +8,7 @@ import numpy as np
 import random
 # from mmcv.parallel import collate
 
+
 def build(cfg, default_args=None):
     if isinstance(cfg, list):
         modules = [

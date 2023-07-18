@@ -35,5 +35,6 @@ def build_head(split_cfg, cfg):
 def build_net(cfg):
     return build(cfg.net, default_args=dict(cfg=cfg))
 
+
 def build_neck(cfg):
     return build(cfg.neck, default_args=dict(cfg=cfg))

@@ -5,6 +5,7 @@ import torch.nn.functional as F
 
 from mmcv.cnn import ConvModule
 
+
 class FPN(nn.Module):
     def __init__(self,
                  in_channels,
