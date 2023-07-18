@@ -18,7 +18,7 @@ def main():
     elif args.test:
         raise NotImplementedError('Test is not implemented yet.')
     else:
-        trainer.fit(runner, train_loader)
+        trainer.fit(runner)
 
 
 def parse_args():
