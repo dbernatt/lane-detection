@@ -1,19 +1,10 @@
-import torch
-from torch import nn
-import torch.nn.functional as F
-import pytorch_lightning as pl
-from tqdm import tqdm
-import numpy as np
-import random
-import os
-
 from lanedet.models.registry import build_net
 from .registry import build_trainer, build_evaluator
 from .optimizer import build_optimizer
 from lanedet.datasets.registry import build_dataloader
 
 
-class Runner(nn.Module):
+class Runner(object):
     def __init__(self, cfg):
         self.cfg = cfg
         self.net = build_net(self.cfg)

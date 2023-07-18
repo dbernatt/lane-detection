@@ -3,6 +3,7 @@ from torch import nn
 import torch.nn.functional as F
 from typing import Any, Callable, List, Optional, Type, Union
 from torch.hub import load_state_dict_from_url
+from lanedet.models.registry import BACKBONES
 
 model_urls = {
     'resnet18':
@@ -165,6 +166,7 @@ class ResNet(nn.Module):
         width_per_group: int = 64,
         replace_stride_with_dilation: Optional[List[bool]] = None,
         norm_layer: Optional[Callable[..., nn.Module]] = None,
+        in_channels=None
     ) -> None:
         super(ResNet, self).__init__()
         if norm_layer is None:
@@ -189,13 +191,25 @@ class ResNet(nn.Module):
         self.bn1 = norm_layer(self.inplanes)
         self.relu = nn.ReLU(inplace=True)
         self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
-        self.layer1 = self._make_layer(block, 64, layers[0])
-        self.layer2 = self._make_layer(
-            block, 128, layers[1], stride=2, dilate=replace_stride_with_dilation[0])
-        self.layer3 = self._make_layer(
-            block, 256, layers[2], stride=2, dilate=replace_stride_with_dilation[1])
-        self.layer4 = self._make_layer(
-            block, 512, layers[3], stride=2, dilate=replace_stride_with_dilation[2])
+        self.in_channels = in_channels
+        self.layer1 = self._make_layer(block, in_channels[0], layers[0])
+        self.layer2 = self._make_layer(block,
+                                       in_channels[1],
+                                       layers[1],
+                                       stride=2,
+                                       dilate=replace_stride_with_dilation[0])
+        self.layer3 = self._make_layer(block,
+                                       in_channels[2],
+                                       layers[2],
+                                       stride=2,
+                                       dilate=replace_stride_with_dilation[1])
+        if in_channels[3] > 0:
+            self.layer4 = self._make_layer(
+                block,
+                in_channels[3],
+                layers[3],
+                stride=2,
+                dilate=replace_stride_with_dilation[2])
         self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
         self.fc = nn.Linear(512 * block.expansion, num_classes)
 
@@ -261,7 +275,6 @@ class ResNet(nn.Module):
         return nn.Sequential(*layers)
 
     def _forward_impl(self, x):
-        # See note [TorchScript super()]
         x = self.conv1(x)
         x = self.bn1(x)
         x = self.relu(x)
@@ -272,9 +285,9 @@ class ResNet(nn.Module):
         x = self.layer3(x)
         x = self.layer4(x)
 
-        x = self.avgpool(x)
-        x = torch.flatten(x, 1)
-        x = self.fc(x)
+        # x = self.avgpool(x)
+        # x = torch.flatten(x, 1)
+        # x = self.fc(x)
 
         return x
 
@@ -282,6 +295,7 @@ class ResNet(nn.Module):
         return self._forward_impl(x)
 
 
+@BACKBONES.register_module
 class ResNetWrapper(nn.Module):
     def __init__(self,
                  resnet='resnet18',
@@ -318,22 +332,22 @@ class ResNetWrapper(nn.Module):
         return x
 
 
-def _resnet(arch, block, layers, pretrained, progress, **kwargs):
+def _resnet(arch, block, layers, pretrained, **kwargs):
     model = ResNet(block, layers, **kwargs)
     if pretrained:
-        print('pretrained model: ', model_urls[arch])
+
         # state_dict = torch.load(model_urls[arch])['net']
         state_dict = load_state_dict_from_url(model_urls[arch])
         model.load_state_dict(state_dict, strict=False)
     return model
 
 
-def resnet18(pretrained=False, progress=True, **kwargs):
+def resnet18(pretrained=False, **kwargs):
     r"""ResNet-18 model from
     `"Deep Residual Learning for Image Recognition" <https://arxiv.org/pdf/1512.03385.pdf>`_
     Args:
         pretrained (bool): If True, returns a model pre-trained on ImageNet
         progress (bool): If True, displays a progress bar of the download to stderr
     """
-    return _resnet('resnet18', BasicBlock, [2, 2, 2, 2], pretrained, progress,
-                   **kwargs)
+    #
+    return _resnet('resnet18', BasicBlock, [2, 2, 2, 2], pretrained, **kwargs)

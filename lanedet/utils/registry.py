@@ -1,15 +1,17 @@
 import inspect
 
 # borrow from mmdetection
+import six
 
 
 def is_str(x):
     """Whether the input is an string instance."""
-    return isinstance(x, str)
+    return isinstance(x, six.string_types)
 
 
 class Registry(object):
     def __init__(self, name):
+
         self._name = name
         self._module_dict = dict()
 
@@ -35,16 +37,19 @@ class Registry(object):
         Args:
             module (:obj:`nn.Module`): Module to be registered.
         """
+
         if not inspect.isclass(module_class):
             raise TypeError('module must be a class, but got {}'.format(
                 type(module_class)))
         module_name = module_class.__name__
+
         if module_name in self._module_dict:
             raise KeyError('{} is already registered in {}'.format(
                 module_name, self.name))
         self._module_dict[module_name] = module_class
 
     def register_module(self, cls):
+
         self._register_module(cls)
         return cls
 
@@ -60,15 +65,17 @@ def build_from_cfg(cfg, registry, default_args=None):
     Returns:
         obj: The constructed object.
     """
+
     assert isinstance(cfg, dict) and 'type' in cfg
     assert isinstance(default_args, dict) or default_args is None
     args = cfg.copy()
     obj_type = args.pop('type')
+
     if is_str(obj_type):
         obj_cls = registry.get(obj_type)
         if obj_cls is None:
-            raise KeyError('{} is not in the {} registry'.format(
-                obj_type, registry.name))
+            raise KeyError(
+                f'{obj_type} is not in the {registry.name} registry')
     elif inspect.isclass(obj_type):
         obj_cls = obj_type
     else:

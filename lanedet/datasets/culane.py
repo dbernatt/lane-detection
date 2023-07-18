@@ -3,10 +3,9 @@ import os.path as osp
 import numpy as np
 from .base_dataset import BaseDataset
 import lanedet.utils.culane_metric as culane_metric
-import cv2
 from tqdm import tqdm
-import logging
 import pickle as pkl
+from .registry import DATASETS
 
 LIST_FILE = {
     'train': 'list/train_gt.txt',
@@ -27,6 +26,7 @@ CATEGORYS = {
 }
 
 
+@DATASETS.register_module
 class CULane(BaseDataset):
     def __init__(self, data_root, split, cfg=None):
         super().__init__(data_root, split, cfg=cfg)

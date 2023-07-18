@@ -16,8 +16,10 @@ from lanedet.models.utils.roi_gather import ROIGather, LinearModule
 from lanedet.models.utils.seg_decoder import SegDecoder
 from lanedet.models.utils.dynamic_assign import assign
 from lanedet.models.losses.lineiou_loss import liou_loss
+from ..registry import HEADS
 
 
+@HEADS.register_module
 class CLRHead(nn.Module):
     def __init__(self,
                  num_points=72,

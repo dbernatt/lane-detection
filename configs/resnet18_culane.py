@@ -1,4 +1,4 @@
-net = dict(type='Detector', )
+net = dict(type='Detector')
 
 backbone = dict(
     type='ResNetWrapper',

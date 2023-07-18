@@ -7,8 +7,10 @@ from torch.utils.data import Dataset
 import torchvision
 import logging
 from lanedet.utils.visualization import imshow_lanes
+from .registry import DATASETS
 
 
+@DATASETS.register_module
 class BaseDataset(Dataset):
     def __init__(self, data_root, split, cfg=None):
         self.cfg = cfg

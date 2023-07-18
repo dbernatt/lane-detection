@@ -4,8 +4,10 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from mmcv.cnn import ConvModule
+from ..registry import NECKS
 
 
+@NECKS.register_module
 class FPN(nn.Module):
     def __init__(self,
                  in_channels,
