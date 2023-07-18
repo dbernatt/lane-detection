@@ -10,7 +10,7 @@ backbone = dict(
 
 num_points = 72
 max_lanes = 4
-sample_y = range(589, 230, -20)
+sample_y = range(160, 230, -20)
 
 heads = dict(type='CLRHead',
              num_priors=192,
@@ -44,11 +44,11 @@ eval_ep = 1
 save_ep = 10
 
 img_norm = dict(mean=[103.939, 116.779, 123.68], std=[1., 1., 1.])
-ori_img_w = 400
+ori_img_w = 460
 ori_img_h = 160
-img_w = 400
+img_w = 460
 img_h = 160
-cut_height = 270
+cut_height = 210
 
 train_process = [
     dict(
@@ -96,7 +96,7 @@ val_process = [
     dict(type='ToTensor', keys=['img']),
 ]
 
-dataset_path = './data/CULane'
+dataset_path = './../data/CULane'
 dataset_type = 'CULane'
 dataset = dict(train=dict(
     type=dataset_type,

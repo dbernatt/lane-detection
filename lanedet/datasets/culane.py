@@ -28,8 +28,9 @@ CATEGORYS = {
 
 @DATASETS.register_module
 class CULane(BaseDataset):
-    def __init__(self, data_root, split, cfg=None):
+    def __init__(self, data_root, split, processes=None, cfg=None):
         super().__init__(data_root, split, cfg=cfg)
+        print('init dataset')
         self.list_path = osp.join(data_root, LIST_FILE[split])
         self.split = split
         self.load_annotations()
