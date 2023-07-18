@@ -70,7 +70,8 @@ def build_from_cfg(cfg, registry, default_args=None):
     assert isinstance(default_args, dict) or default_args is None
     args = cfg.copy()
     obj_type = args.pop('type')
-
+    print('args: ', args)
+    print('obj_type: ', obj_type)
     if is_str(obj_type):
         obj_cls = registry.get(obj_type)
         if obj_cls is None:

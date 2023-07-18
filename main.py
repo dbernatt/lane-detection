@@ -13,15 +13,14 @@ def main():
     cfg.work_dirs = args.work_dirs if args.work_dirs else cfg.work_dirs
 
     runner = Runner(cfg)
-    return
     trainer = pl.Trainer(fast_dev_run=True, max_epochs=cfg.epochs)
 
-    if args.validate:
+    if hasattr(args, 'validate'):
         raise NotImplementedError('Validation is not implemented yet.')
-    elif args.test:
+    elif hasattr(args, 'test'):
         raise NotImplementedError('Test is not implemented yet.')
     else:
-        runner.train(cfg)
+        runner.train()
         # trainer.fit(runner)
 
 

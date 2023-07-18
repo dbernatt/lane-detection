@@ -22,7 +22,7 @@ def build(cfg, registry, default_args=None):
 
 
 def build_dataset(split_cfg, cfg):
-    return build(split_cfg, default_args=dict(cfg=cfg))
+    return build(split_cfg, DATASETS, default_args=dict(cfg=cfg))
 
 
 def build_dataloader(split_cfg, cfg, is_train=True):
