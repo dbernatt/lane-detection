@@ -60,7 +60,7 @@ google-auth==2.16.0
 google-auth-oauthlib==0.4.6
 google-pasta==0.2.0
 greenlet==2.0.1
-grpcio==1.51.1
+grpcio==1.53.0
 gyp==0.1
 h11==0.14.0
 h5py==3.7.0
