@@ -6,10 +6,10 @@ from torch.utils.data import DataLoader
 from functools import partial
 import numpy as np
 import random
-# from mmcv.parallel import collate
+from mmcv.parallel import collate
 
 DATASETS = Registry('datasets')
-
+PROCESS = Registry('process')
 
 def build(cfg, registry, default_args=None):
     if isinstance(cfg, list):
@@ -25,6 +25,12 @@ def build_dataset(split_cfg, cfg):
     return build(split_cfg, DATASETS, default_args=dict(cfg=cfg))
 
 
+def worker_init_fn(worker_id, seed):
+    worker_seed = worker_id + seed
+    np.random.seed(worker_seed)
+    random.seed(worker_seed)
+
+
 def build_dataloader(split_cfg, cfg, is_train=True):
     if is_train:
         shuffle = True
@@ -33,6 +39,8 @@ def build_dataloader(split_cfg, cfg, is_train=True):
 
     dataset = build_dataset(split_cfg, cfg)
 
+    init_fn = partial(worker_init_fn, seed=cfg.seed)
+
     data_loader = DataLoader(
         dataset,
         batch_size=cfg.batch_size,
@@ -40,6 +48,7 @@ def build_dataloader(split_cfg, cfg, is_train=True):
         num_workers=cfg.workers,
         pin_memory=False,
         drop_last=False,
+        collate_fn=partial(collate, samples_per_gpu=samples_per_gpu),
     )
 
     return data_loader

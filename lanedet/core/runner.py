@@ -12,7 +12,7 @@ class Runner(object):
 
     def train_epoch(self, epoch, train_loader):
         self.net.train()
-        max_iter = len(train_loader)
+        # max_iter = len(train_loader)
         for i, data in enumerate(train_loader):
             output = self.net(data)
 
@@ -29,7 +29,9 @@ class Runner(object):
         train_loader = build_dataloader(self.cfg.dataset.train,
                                         self.cfg,
                                         is_train=True)
-
+        # print(next(iter(train_loader))[0].shape)
+        print('dataloader: ', len(train_loader))
+        print('dataloader.shape: ', train_loader)
         print('Start training...')
         start_epoch = 0
 

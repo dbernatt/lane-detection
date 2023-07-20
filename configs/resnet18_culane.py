@@ -117,7 +117,7 @@ dataset = dict(train=dict(
     processes=val_process,
 ))
 
-workers = 10
+workers = 2
 log_interval = 1000
 # seed = 0
 num_classes = 4 + 1
