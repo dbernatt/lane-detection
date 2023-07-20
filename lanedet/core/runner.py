@@ -1,3 +1,6 @@
+import torch
+import numpy as np
+import random
 from lanedet.models.registry import build_net
 from .registry import build_trainer, build_evaluator
 from .optimizer import build_optimizer
@@ -6,6 +9,9 @@ from lanedet.datasets.registry import build_dataloader
 
 class Runner(object):
     def __init__(self, cfg):
+        torch.manual_seed(cfg.seed)
+        np.random.seed(cfg.seed)
+        random.seed(cfg.seed)
         self.cfg = cfg
         self.net = build_net(self.cfg)
         self.optimizer = build_optimizer(self.cfg, self.net)
@@ -36,14 +42,16 @@ class Runner(object):
         start_epoch = 0
 
         for epoch in range(start_epoch, self.cfg.epochs):
+            print('epoch: ', epoch)
             self.train_epoch(epoch, train_loader)
-            if (epoch +
-                    1) % self.cfg.save_ep == 0 or epoch == self.cfg.epochs - 1:
-                self.save_ckpt()
-            if (epoch +
-                    1) % self.cfg.eval_ep == 0 or epoch == self.cfg.epochs - 1:
-                self.validate()
-            if self.recorder.step >= self.cfg.total_iter:
-                break
-            if self.cfg.lr_update_by_epoch:
-                self.scheduler.step()
+            return
+            # if (epoch +
+            #         1) % self.cfg.save_ep == 0 or epoch == self.cfg.epochs - 1:
+            #     self.save_ckpt()
+            # if (epoch +
+            #         1) % self.cfg.eval_ep == 0 or epoch == self.cfg.epochs - 1:
+            #     self.validate()
+            # if self.recorder.step >= self.cfg.total_iter:
+            #     break
+            # if self.cfg.lr_update_by_epoch:
+            #     self.scheduler.step()

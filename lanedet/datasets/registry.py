@@ -41,6 +41,13 @@ def build_dataloader(split_cfg, cfg, is_train=True):
 
     init_fn = partial(worker_init_fn, seed=cfg.seed)
 
+    print(type(cfg.batch_size))
+    print(cfg.batch_size)
+    print(type(cfg.gpus))
+    print(cfg.gpus)
+    samples_per_gpu = cfg.batch_size // cfg.gpus
+    print(type(samples_per_gpu))
+    print(samples_per_gpu)
     data_loader = DataLoader(
         dataset,
         batch_size=cfg.batch_size,
@@ -49,6 +56,7 @@ def build_dataloader(split_cfg, cfg, is_train=True):
         pin_memory=False,
         drop_last=False,
         collate_fn=partial(collate, samples_per_gpu=samples_per_gpu),
+        worker_init_fn=init_fn
     )
 
     return data_loader

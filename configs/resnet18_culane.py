@@ -119,7 +119,7 @@ dataset = dict(train=dict(
 
 workers = 2
 log_interval = 1000
-# seed = 0
+seed = 0
 num_classes = 4 + 1
 ignore_label = 255
 bg_weight = 0.4
