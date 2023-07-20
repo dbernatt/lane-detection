@@ -1,5 +1,5 @@
 from lanedet.utils import Registry, build_from_cfg
-
+import tqdm
 import torch
 from torch import nn
 from torch.utils.data import DataLoader
@@ -38,25 +38,35 @@ def build_dataloader(split_cfg, cfg, is_train=True):
         shuffle = False
 
     dataset = build_dataset(split_cfg, cfg)
+    print('dataset len : ', len(dataset)) # 88880
+    print('dataset item: ', dataset[0])
+    print('dataset item len: ', len(dataset[0])) # 8
+    print('batch size: ', cfg.batch_size)
 
-    init_fn = partial(worker_init_fn, seed=cfg.seed)
+    # for i in range(len(dataset)):
+    #   print(len(dataset[i]))
+    #   if i == 100:
+    #     exit(0)
+    #   if len(dataset[i]) != 8:
+    #     print(dataset[i])
+    #     exit(0)
 
-    print(type(cfg.batch_size))
-    print(cfg.batch_size)
-    print(type(cfg.gpus))
-    print(cfg.gpus)
-    samples_per_gpu = cfg.batch_size // cfg.gpus
-    print(type(samples_per_gpu))
-    print(samples_per_gpu)
+    # init_fn = partial(worker_init_fn, seed=cfg.seed)
+
+    # samples_per_gpu = cfg.batch_size // cfg.gpus
+
+    print('Loading dataset...')
     data_loader = DataLoader(
         dataset,
         batch_size=cfg.batch_size,
         shuffle=shuffle,
-        num_workers=cfg.workers,
-        pin_memory=False,
-        drop_last=False,
-        collate_fn=partial(collate, samples_per_gpu=samples_per_gpu),
-        worker_init_fn=init_fn
+        # num_workers=cfg.workers,
+        # pin_memory=False,
+        # drop_last=False
+        # collate_fn=partial(collate, samples_per_gpu=samples_per_gpu),
+        # worker_init_fn=init_fn
     )
+
+    print('dataloader element: ', next(iter(data_loader)))
 
     return data_loader

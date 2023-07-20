@@ -34,7 +34,7 @@ neck = dict(type='FPN',
 test_parameters = dict(conf_threshold=0.4, nms_thres=50, nms_topk=max_lanes)
 
 epochs = 15
-batch_size = 24
+batch_size = 16
 
 optimizer = dict(type='AdamW', lr=0.6e-3)  # 3e-4 for batchsize 8
 total_iter = (88880 // batch_size) * epochs
@@ -117,7 +117,7 @@ dataset = dict(train=dict(
     processes=val_process,
 ))
 
-workers = 2
+workers = 8
 log_interval = 1000
 seed = 0
 num_classes = 4 + 1

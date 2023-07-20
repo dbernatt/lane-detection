@@ -1,6 +1,6 @@
 import collections
 
-from clrnet.utils import build_from_cfg
+from lanedet.utils import build_from_cfg
 
 from ..registry import PROCESS
 
@@ -12,6 +12,7 @@ class Process(object):
             config dict to be composed.
     """
     def __init__(self, processes, cfg):
+        print('process init')
         assert isinstance(processes, collections.abc.Sequence)
         self.processes = []
         for process in processes:
@@ -24,7 +25,7 @@ class Process(object):
                 self.processes.append(process)
             else:
                 raise TypeError('process must be callable or a dict')
-
+        print('process init done')
     def __call__(self, data):
         """Call function to apply processes sequentially.
         Args:

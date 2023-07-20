@@ -37,6 +37,7 @@ class CULane(BaseDataset):
         print('init finished')
 
     def load_annotations(self):
+        print('Loading CULane annotations...')
         self.logger.info('Loading CULane annotations...')
         # Waiting for the dataset to load is tedious, let's cache it
         os.makedirs('cache', exist_ok=True)
@@ -53,7 +54,7 @@ class CULane(BaseDataset):
             for line in list_file:
                 infos = self.load_annotation(line.split())
                 self.data_infos.append(infos)
-
+        # print('data_infos = ', self.data_infos)
         # cache data infos to file
         with open(cache_path, 'wb') as cache_file:
             pkl.dump(self.data_infos, cache_file)
