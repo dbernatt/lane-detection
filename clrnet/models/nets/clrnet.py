@@ -21,12 +21,10 @@ class CLRNet(pl.LightningModule):
   def __init__(self, 
                 backbone, 
                 neck, 
-                var = 10,
                 batch_size = 16,
                 ):
     super(CLRNet, self).__init__()
     print('Init CLRNet...')
-    print(var)
     self.training = True
     self.batch_size = batch_size
 
@@ -38,13 +36,11 @@ class CLRNet(pl.LightningModule):
 
   def forward(self, x):
     out = self.backbone(x['img'] if isinstance(x, dict) else x)
-
-    if self.neck:
-        features = self.neck(features)
-
+    out = self.neck(out)
     return out
 
   def training_step(self, batch_idx, batch):
+    print('CLRNet training step...')
     x, y = batch
     y_hat = self.encoder(x)
     loss = F.cross_entropy(y_hat, y)

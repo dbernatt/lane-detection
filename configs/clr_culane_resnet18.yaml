@@ -4,6 +4,26 @@ seed_everything: true
 data:
   data_root: 'data/CULane'
   batch_size: 16
+  img_w: 400
+  img_h: 160
+  cut_height: 73
+  work_dirs: 'work_dirs/clr/r18_culane'
+  img_norm: 
+    mean: 
+    - 103.939
+    - 116.779
+    - 123.68
+    std: 
+    - 1.
+    - 1. 
+    - 1.
+  transforms:
+    train:
+    - to_tensor: 
+        img: null
+        lane_line: null
+        seg: null
+
 
 model:
   backbone: 
@@ -19,6 +39,7 @@ model:
     num_outs: 3
     upsample_cfg: 
       mode: 'nearest'
+      
 trainer:
   accelerator: auto
   strategy: auto
