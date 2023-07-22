@@ -19,7 +19,7 @@ def main():
   # assert isinstance(config['data']['type'], (str))
   # data_type = config['data']['type']
 
-  cli = CLRNetCLI(CLRNet, CULaneDataset)
+  cli = CLRNetCLI()
 
   # if data_type == data_types[0]:
   #   cli = CLRNetCLI(CLRNet, CULaneDataModule)
