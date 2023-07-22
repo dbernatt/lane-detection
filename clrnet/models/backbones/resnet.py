@@ -308,8 +308,6 @@ class ResNetWrapper(nn.Module):
 def _resnet(arch, block, layers, pretrained, **kwargs):
     model = ResNet(block, layers, **kwargs)
     if pretrained:
-
-        # state_dict = torch.load(model_urls[arch])['net']
         state_dict = load_state_dict_from_url(model_urls[arch])
         model.load_state_dict(state_dict, strict=False)
     return model

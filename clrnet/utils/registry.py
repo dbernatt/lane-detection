@@ -50,7 +50,7 @@ class Registry(object):
         return cls
 
 
-def build_from_cfg(cfg, registry, default_args=None):
+def build_from_cfg(cfg, registry):
     """Build a module from config dict.
 
     Args:
@@ -62,7 +62,6 @@ def build_from_cfg(cfg, registry, default_args=None):
         obj: The constructed object.
     """
     assert isinstance(cfg, dict) and 'type' in cfg
-    assert isinstance(default_args, dict) or default_args is None
     args = cfg.copy()
     obj_type = args.pop('type')
     if is_str(obj_type):
@@ -75,7 +74,4 @@ def build_from_cfg(cfg, registry, default_args=None):
     else:
         raise TypeError('type must be a str or valid type, but got {}'.format(
             type(obj_type)))
-    if default_args is not None:
-        for name, value in default_args.items():
-            args.setdefault(name, value)
     return obj_cls(**args)

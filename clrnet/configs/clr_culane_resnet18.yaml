@@ -19,7 +19,8 @@ model:
     in_channels: [128, 256, 512]
     out_channels: 64
     num_outs: 3
-
+    upsample_cfg: 
+      mode: 'nearest'
 
 trainer:
   accelerator: auto
