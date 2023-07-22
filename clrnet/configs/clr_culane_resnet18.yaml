@@ -1,5 +1,26 @@
 # pytorch_lightning==2.0.5
 seed_everything: true
+
+data:
+  data_root: null
+  batch_size: 16
+
+model:
+  batch_size: 16
+
+  backbone: 
+    type: 'ResNetWrapper'
+    resnet: 'resnet18'
+    pretrained: True
+    out_conv: False
+  
+  neck:
+    type: 'FPN'
+    in_channels: [128, 256, 512]
+    out_channels: 64
+    num_outs: 3
+
+
 trainer:
   accelerator: auto
   strategy: auto
@@ -40,12 +61,3 @@ trainer:
   sync_batchnorm: false
   reload_dataloaders_every_n_epochs: 0
   default_root_dir: null
-model:
-  cfg: null
-data:
-  data_root: null
-  batch_size: 16
-  train_transforms: null
-  val_transforms: null
-  test_transforms: null
-ckpt_path: null

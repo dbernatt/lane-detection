@@ -18,15 +18,15 @@ def build(cfg, registry, default_args=None):
 
 
 def build_backbones(cfg):
-    return build(cfg.backbone, BACKBONES, default_args=dict(cfg=cfg))
+    return build(cfg, BACKBONES, default_args=dict(cfg=cfg))
 
 
 def build_necks(cfg):
-    return build(cfg.necks, NECKS, default_args=dict(cfg=cfg))
+    return build(cfg, NECKS, default_args=dict(cfg=cfg))
 
 
 def build_heads(cfg):
-    return build(cfg.heads, HEADS, default_args=dict(cfg=cfg))
+    return build(cfg, HEADS, default_args=dict(cfg=cfg))
 
 
 def build_head(split_cfg, cfg):
@@ -34,4 +34,4 @@ def build_head(split_cfg, cfg):
 
 
 def build_net(cfg):
-    return build(cfg.net, NETS, default_args=dict(cfg=cfg))
+    return build(cfg, NETS, default_args=dict(cfg=cfg))

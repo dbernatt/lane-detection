@@ -1,4 +1,0 @@
-pytorch_lightning==2.0.5
-PyYAML==6.0
-PyYAML==6.0.1
-torch==2.0.1+cu118

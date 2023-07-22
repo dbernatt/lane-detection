@@ -4,22 +4,34 @@ import torch.functional as F
 
 import torchvision.models as models
 
-from ..registry import build_backbones
+from ..registry import build_backbones, build_necks
 
+
+class Encoder:
+  def __init__(self):
+    super().__init__()
+
+
+class Decoder:
+  def __init__(self):
+    super().__init__()
 
 class CLRNet(pl.LightningModule):
 
-  def __init__(self):
-    super(CLRNet).__init__()
-    self.batch_size = 16
-    self.data_root = ''
-    print('cfg: ', self.config)
-    print(_cufft_get_plan_cache_size)
-    self.backbone = models.resnet18(pretrained=True)
-    # self.backbone = build_backbones(cfg)
-    # self.neck = build_neck(cfg)
-    # self.head = build_head(cfg)
-    # self.loss = build_loss(cfg)
+  def __init__(self, 
+                backbone, 
+                neck, 
+                batch_size = 16):
+    super(CLRNet, self).__init__()
+    print('Init CLRNet...')
+    
+    self.batch_size = batch_size
+
+    print('backbone = ', backbone)
+    self.backbone = build_backbones(backbone)
+
+    print('neck = ', neck)   
+    self.neck = build_necks(neck)
 
   def forward(self, x):
     out = self.backbone(x)
