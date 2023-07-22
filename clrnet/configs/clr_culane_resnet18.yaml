@@ -2,12 +2,10 @@
 seed_everything: true
 
 data:
-  data_root: null
+  data_root: 'data/CULane'
   batch_size: 16
 
 model:
-  batch_size: 16
-
   backbone: 
     type: 'ResNetWrapper'
     resnet: 'resnet18'
@@ -21,7 +19,6 @@ model:
     num_outs: 3
     upsample_cfg: 
       mode: 'nearest'
-
 trainer:
   accelerator: auto
   strategy: auto

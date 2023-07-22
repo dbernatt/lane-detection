@@ -21,10 +21,13 @@ class CLRNet(pl.LightningModule):
   def __init__(self, 
                 backbone, 
                 neck, 
-                batch_size = 16):
+                var = 10,
+                batch_size = 16,
+                ):
     super(CLRNet, self).__init__()
     print('Init CLRNet...')
-    
+    print(var)
+    self.training = True
     self.batch_size = batch_size
 
     print('backbone = ', backbone)
@@ -34,7 +37,11 @@ class CLRNet(pl.LightningModule):
     self.neck = build_necks(neck)
 
   def forward(self, x):
-    out = self.backbone(x)
+    out = self.backbone(x['img'] if isinstance(x, dict) else x)
+
+    if self.neck:
+        features = self.neck(features)
+
     return out
 
   def training_step(self, batch_idx, batch):
