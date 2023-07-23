@@ -31,13 +31,9 @@ def main():
   assert isinstance(data_type, (str))
 
   if data_type == data_types['CULane']:
-    args: ArgsType = None
-    cli = CLRNetCLI(CLRNet, CULaneDataModule, args=args, run=True)
+    cli = CLRNetCLI(CLRNet, CULaneDataModule, run=True)
   else:
     raise ValueError("'{}' data_type not found!".format(data_type))
-
-  # cli = CLRNetCLI(CLRNet, CULaneDataModule)
-
 
 def load_cfg(filename):
   try:
@@ -46,9 +42,9 @@ def load_cfg(filename):
     return config
   except IOError as e:
     if e.errno == errno.ENOENT:
-        raise e('File not found')
+        raise e('Config file not found')
     elif e.errno == errno.EACCES:
-        raise e('Permission denied')
+        raise e('Permission denied to open config file')
     else:
         raise e
   return None
