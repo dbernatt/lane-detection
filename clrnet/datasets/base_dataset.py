@@ -10,14 +10,15 @@ from clrnet.utils.visualization import imshow_lanes
 from clrnet.datasets.process import Process
 # from mmcv.parallel import DataContainer as DC
 
-
+# cfg, split, processes)
 class BaseDataset(Dataset):
-    def __init__(self, data_root, split, transforms=None, work_dirs = "work_dirs/clr/r18_culane"):
+    def __init__(self, cfg, split, processes):
         print('init base dataset...')
-        # self.cfg = cfg
+        self.cfg = cfg
         # self.logger = logging.getLogger(__name__)
-        self.work_dirs = work_dirs
-        self.data_root = data_root
+        print('basic dataset: ', cfg)
+        self.work_dirs = cfg['work_dirs']
+        self.data_root = cfg['data_root']
         self.training = 'train' in split
         self.processes = Process(processes, cfg)
 
@@ -26,7 +27,7 @@ class BaseDataset(Dataset):
         for lanes, img_meta in zip(predictions, img_metas):
             img_name = img_meta['img_name']
             img = cv2.imread(osp.join(self.data_root, img_name))
-            out_file = osp.join(self.cfg.work_dir, 'visualization',
+            out_file = osp.join(self.work_dirs, 'visualization',
                                 img_name.replace('/', '_'))
             lanes = [lane.to_array(self.cfg) for lane in lanes] # !!!
             imshow_lanes(img, lanes, out_file=out_file)

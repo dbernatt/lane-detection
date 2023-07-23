@@ -29,11 +29,11 @@ CATEGORYS = {
 }
 
 class CULaneDataset(BaseDataset):
-    def __init__(self, cfg:):
-        super().__init__()
-        self.data_root = data_root
+    def __init__(self, cfg, split, processes):
+        super().__init__(cfg, split, processes)
+        self.list_path = osp.join(self.data_root, LIST_FILE[split])
+        self.data_root = cfg.data_root
         self.split = split
-        self.list_path = osp.join(data_root, LIST_FILE[split])
         self.load_annotations()
 
     def load_annotations(self):

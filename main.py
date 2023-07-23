@@ -6,25 +6,38 @@ from pytorch_lightning.cli import LightningCLI, ArgsType
 from pytorch_lightning.demos.boring_classes import DemoModel, BoringDataModule
 
 from clrnet.models import CLRNet
-from clrnet.datasets import CULaneDataset
+from clrnet.datasets import CULaneDataModule
 from clrnet.cli import CLRNetCLI
 
-data_types = [
-  'CULane'
-]
+data_types = {
+  "CULane": 'CULane'
+}
 
 def main():
-  # args = parse_args()
-  # config = load_cfg(config)
-  # assert isinstance(config['data']['type'], (str))
-  # data_type = config['data']['type']
+  parser = argparse.ArgumentParser()
+  args = parse_args()
+  config = load_cfg(args.config)
+  print('config = ', config)
+  data = config.get('data')
 
-  cli = CLRNetCLI(run = False)
+  if data == None:
+    raise ValueError('Missing data from config!')
 
-  # if data_type == data_types[0]:
-  #   cli = CLRNetCLI(CLRNet, CULaneDataModule)
-  # else:
-  #   raise ModuleNotFoundError('This data type does not exists!')
+  data_type = data.get('data_type')
+  
+  if data_type == None:
+    raise ValueError('Missing data_type from data!')
+  
+  assert isinstance(data_type, (str))
+
+  if data_type == data_types['CULane']:
+    args: ArgsType = None
+    cli = CLRNetCLI(CLRNet, CULaneDataModule, args=args, run=True)
+  else:
+    raise ValueError("'{}' data_type not found!".format(data_type))
+
+  # cli = CLRNetCLI(CLRNet, CULaneDataModule)
+
 
 def load_cfg(filename):
   try:
@@ -42,11 +55,23 @@ def load_cfg(filename):
 
 def parse_args():
   parser = argparse.ArgumentParser(description='Train arguments for detection')
-  print('aaa')
+  
   parser.add_argument("--config", 
                       default='./clrnet/configs/clr_culane_resnet18.yaml', 
                       help="Config file path")
-
+  parser.add_argument("fit", 
+                    nargs='?',
+                    help="Set cli stage [fit, predict, test]",
+                    )
+  parser.add_argument("test", 
+                    nargs='?',
+                    help="Set cli stage [fit, predict, test]",
+                    )
+                    
+  parser.add_argument("predict", 
+                    nargs='?',
+                    help="Set cli stage [fit, predict, test]",
+                    )
   args = parser.parse_args()
   print('parse args=', args)
   return args
