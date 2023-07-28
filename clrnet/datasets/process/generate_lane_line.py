@@ -13,18 +13,27 @@ from ..registry import PROCESS
 @PROCESS.register_module
 class GenerateLaneLine(object):
     def __init__(self, transforms=None, cfg=None, training=True):
+        print('Init Generate Lane Line')
+        print('object: ', object)
+        print('transforms: ', transforms)
+        print('cfg: ', cfg)
         self.transforms = transforms
-        self.img_w, self.img_h = cfg.img_w, cfg.img_h
-        self.num_points = cfg.num_points
-        self.n_offsets = cfg.num_points
-        self.n_strips = cfg.num_points - 1
+        self.img_w, self.img_h = cfg['img_w'], cfg['img_h']
+        self.num_points = cfg['num_points']
+        self.n_offsets = cfg['num_points']
+        self.n_strips = cfg['num_points'] - 1
         self.strip_size = self.img_h / self.n_strips
-        self.max_lanes = cfg.max_lanes
+        self.max_lanes = cfg['max_lanes']
         self.offsets_ys = np.arange(self.img_h, -1, -self.strip_size)
         self.training = training
 
+        print('transforms: ', transforms)
+        print('transforms: ', type(transforms))
+        print('Elotte: ', transforms is None)
         if transforms is None:
+            print('Be')
             transforms = CLRTransforms(self.img_h, self.img_w)
+
 
         if transforms is not None:
             img_transforms = []

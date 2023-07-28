@@ -2,7 +2,7 @@ import os
 import os.path as osp
 import numpy as np
 from .base_dataset import BaseDataset
-# from .registry import DATASETS
+from .registry import DATASETS
 # import clrnet.utils.culane_metric as culane_metric
 import cv2
 from tqdm import tqdm
@@ -28,11 +28,12 @@ CATEGORYS = {
     'night': 'list/test_split/test8_night.txt',
 }
 
+@DATASETS.register_module
 class CULaneDataset(BaseDataset):
     def __init__(self, cfg, split, processes):
         super().__init__(cfg, split, processes)
-        self.list_path = osp.join(self.data_root, LIST_FILE[split])
-        self.data_root = cfg.data_root
+        self.list_path = osp.join(self.cfg['data_root'], LIST_FILE[split])
+        self.data_root = cfg['data_root']
         self.split = split
         self.load_annotations()
 

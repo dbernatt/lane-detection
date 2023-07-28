@@ -13,28 +13,23 @@ from clrnet.datasets.process import Process
 from torch.utils.data.dataloader import default_collate
 
 class CULaneDataModule(pl.LightningDataModule):
-  def __init__(self, data_type,
-                      data_root, 
-                      batch_size,
-                      img_w,
-                      img_h,
-                      cut_height,
-                      img_norm,
-                      work_dirs,
-                      processes):
+  def __init__(self, cfg, processes):
     super(CULaneDataModule, self).__init__()
     print('Init CULaneDataModule...')
-
     self.save_hyperparameters()
-    self.cfg = {
-      "data_root": data_root,
-      "batch_size": batch_size,
-      "img_w": img_w,
-      "img_h": img_h,
-      "cut_height": cut_height,
-      "work_dirs": work_dirs,
-      "img_norm": img_norm,
-    }
+
+    # self.data_type = data_type
+    # self.data_root = data_root
+    # self.batch_size = batch_size
+    # self.img_w = img_w
+    # self.img_h = img_h
+    # self.cut_height = cut_height
+    # self.img_norm = img_norm
+    # self.work_dirs = work_dirs
+    
+    print('data module cfg: ', cfg)
+    print('data module processes: ', processes)
+    self.cfg = cfg
     self.processes = processes
 
   def prepare_data(self):
@@ -64,7 +59,7 @@ class CULaneDataModule(pl.LightningDataModule):
 
   def train_dataloader(self):
     print('Create train dataloader...')
-    return DataLoader(self.culane_train_set, batch_size=self.batch_size)
+    return DataLoader(self.culane_train_set, batch_size=self.cfg['batch_size'])
     # return DataLoader(self.mnist_train, batch_size=self.batch_size)
 
   def val_dataloader(self):

@@ -1,8 +1,8 @@
 import collections
 
-# from clrnet.utils import build_from_cfg
+from clrnet.utils import build_from_cfg
 
-# from ..registry import PROCESS
+from ..registry import PROCESS
 
 
 class Process(object):
@@ -16,8 +16,7 @@ class Process(object):
         self.processes = []
         for process in processes:
             if isinstance(process, dict):
-                process = build_from_cfg(process,
-                                         default_args=dict(cfg=cfg))
+                process = build_from_cfg(PROCESS, process, default_cfg=cfg)
                 self.processes.append(process)
             elif callable(process):
                 self.processes.append(process)

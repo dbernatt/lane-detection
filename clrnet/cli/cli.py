@@ -55,7 +55,7 @@ class CLRNetCLI(LightningCLI):
 
     def add_arguments_to_parser(self, parser):
         print('parser = ', parser)
-        parser.link_arguments("data.batch_size", "model.batch_size")
+        parser.link_arguments("data.batch_size", "model.init_args.batch_size")
         # parser.link_arguments("data.batch_size", "model.batch_size", apply_on='instantiate')
 
     # def add_arguments_to_parser(self, parser):

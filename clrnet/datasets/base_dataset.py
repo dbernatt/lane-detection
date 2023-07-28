@@ -8,13 +8,18 @@ import torchvision
 import logging
 from clrnet.utils.visualization import imshow_lanes
 from clrnet.datasets.process import Process
+from .registry import DATASETS
+
 # from mmcv.parallel import DataContainer as DC
 
-# cfg, split, processes)
+@DATASETS.register_module
 class BaseDataset(Dataset):
     def __init__(self, cfg, split, processes):
         print('init base dataset...')
         self.cfg = cfg
+
+        print('base dataset cfg: ', self.cfg)
+        print('processes: ', processes)
         # self.logger = logging.getLogger(__name__)
         print('basic dataset: ', cfg)
         self.work_dirs = cfg['work_dirs']
@@ -39,7 +44,7 @@ class BaseDataset(Dataset):
         print('base dataset get item...')
         data_info = self.data_infos[idx]
         img = cv2.imread(data_info['img_path'])
-        img = img[self.cfg.cut_height:, :, :]
+        img = img[self.cfg['cut_height']:, :, :]
         sample = data_info.copy()
         sample.update({'img': img})
 
@@ -48,15 +53,15 @@ class BaseDataset(Dataset):
             if len(label.shape) > 2:
                 label = label[:, :, 0]
             label = label.squeeze()
-            label = label[self.cfg.cut_height:, :]
+            label = label[self.cfg['cut_height']:, :]
             sample.update({'mask': label})
 
-            if self.cfg.cut_height != 0:
+            if self.cfg['cut_height'] != 0:
                 new_lanes = []
                 for i in sample['lanes']:
                     lanes = []
                     for p in i:
-                        lanes.append((p[0], p[1] - self.cfg.cut_height))
+                        lanes.append((p[0], p[1] - self.cfg['cut_height']))
                     new_lanes.append(lanes)
                 sample.update({'lanes': new_lanes})
 
@@ -65,5 +70,5 @@ class BaseDataset(Dataset):
                 'img_name': data_info['img_name']}
         # meta = DC(meta, cpu_only=True)
         sample.update({'meta': meta})
-        print('sample = ', sample)
+        # print('sample = ', sample)
         return sample

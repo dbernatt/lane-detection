@@ -1,3 +1,4 @@
+import torch
 import pytorch_lightning as pl
 from torch import _cufft_get_plan_cache_size
 import torch.functional as F
@@ -21,7 +22,7 @@ class CLRNet(pl.LightningModule):
   def __init__(self, 
                 backbone, 
                 neck, 
-                batch_size = 16,
+                batch_size = 16
                 ):
     super(CLRNet, self).__init__()
     print('Init CLRNet...')
@@ -47,5 +48,4 @@ class CLRNet(pl.LightningModule):
     return loss
 
   def configure_optimizers(self):
-    # TO DO
-    pass
+    return torch.optim.Adam(self.parameters(), lr=0.6e-3)

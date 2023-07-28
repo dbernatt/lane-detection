@@ -7,22 +7,22 @@ NECKS = Registry('necks')
 NETS = Registry('nets')
 
 
-def build(cfg, registry):
+def build(registry, cfg):
     if isinstance(cfg, list):
         modules = [
-            build_from_cfg(cfg_, registry) for cfg_ in cfg
+            build_from_cfg(registry, cfg_) for cfg_ in cfg
         ]
         return nn.Sequential(*modules)
     else:
-        return build_from_cfg(cfg, registry)
+        return build_from_cfg(registry, cfg)
 
 
 def build_backbones(cfg):
-    return build(cfg, BACKBONES)
+    return build(BACKBONES, cfg)
 
 
 def build_necks(cfg):
-    return build(cfg, NECKS)
+    return build(NECKS, cfg)
 
 
 def build_heads(cfg):
@@ -34,4 +34,4 @@ def build_head(split_cfg, cfg):
 
 
 def build_net(cfg):
-    return build(cfg, NETS)
+    return build(NETS, cfg)

@@ -1,4 +1,5 @@
 import inspect
+from types import NoneType
 
 import six
 
@@ -36,6 +37,7 @@ class Registry(object):
         Args:
             module (:obj:`nn.Module`): Module to be registered.
         """
+        print('register module cls: ', module_class)
         if not inspect.isclass(module_class):
             raise TypeError('module must be a class, but got {}'.format(
                 type(module_class)))
@@ -50,7 +52,7 @@ class Registry(object):
         return cls
 
 
-def build_from_cfg(cfg, registry):
+def build_from_cfg(registry, cfg, default_cfg = None):
     """Build a module from config dict.
 
     Args:
@@ -61,6 +63,8 @@ def build_from_cfg(cfg, registry):
     Returns:
         obj: The constructed object.
     """
+    print('reg = ', registry)
+    print('cfg = ', cfg)
     assert isinstance(cfg, dict) and 'type' in cfg
     args = cfg.copy()
     obj_type = args.pop('type')

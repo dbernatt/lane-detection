@@ -10,7 +10,7 @@ from clrnet.datasets import CULaneDataModule
 from clrnet.cli import CLRNetCLI
 
 data_types = {
-  "CULane": 'CULane'
+  "CULane": "clrnet.datasets.CULaneDataModule"
 }
 
 def main():
@@ -19,19 +19,28 @@ def main():
   config = load_cfg(args.config)
   print('config = ', config)
   data = config.get('data')
-
+  
   if data == None:
     raise ValueError('Missing data from config!')
 
-  data_type = data.get('data_type')
+  data_type = data.get('class_path')
   
   if data_type == None:
-    raise ValueError('Missing data_type from data!')
+    raise ValueError('Missing class_path from data!')
   
   assert isinstance(data_type, (str))
 
   if data_type == data_types['CULane']:
-    cli = CLRNetCLI(CLRNet, CULaneDataModule, run=True)
+    cli = CLRNetCLI(CLRNet, 
+                    CULaneDataModule, 
+                    run=True,
+                    subclass_mode_model=True, 
+                    subclass_mode_data=True,
+                    parser_kwargs={
+                      "default_config_files": ["/configs/clr_culane_resnet18.yaml"],
+                      "parser_mode": "omegaconf"
+                    })
+    
   else:
     raise ValueError("'{}' data_type not found!".format(data_type))
 
