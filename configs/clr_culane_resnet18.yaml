@@ -1,14 +1,13 @@
 # pytorch_lightning==2.0.5
 seed_everything: true
 
-
 data:
   class_path: clrnet.datasets.CULaneDataModule
   init_args:
     cfg: 
       data_type: 'CULane'
       data_root: 'data/CULane'
-      batch_size: 16
+      batch_size: 24
       img_w: 400
       img_h: 160
       cut_height: 73
@@ -18,32 +17,41 @@ data:
         std: [1., 1., 1.]
       num_points: 72
       max_lanes: 4
+      workers: 2
 
     processes:
       train:
         - type: 'GenerateLaneLine'
-          transforms: []
+          transforms: null
           cfg: ${data.init_args.cfg}
-        - type: 'Normalize'
-          img_norm: ${data.init_args.cfg.img_norm}
+        #- type: 'Normalize'
+        #  img_norm: ${data.init_args.cfg.img_norm}
         - type: 'ToTensor'
           keys: ['img', 'lane_line', 'seg']
 
 model:
-  class_path: clrnet.models.CLRNet
+  class_path: clrnet.cli.Runner
   init_args:
-    backbone: 
-      type: 'ResNetWrapper'
-      resnet: 'resnet18'
-      pretrained: True
-      out_conv: False
-    neck:
-      type: 'FPN'
-      in_channels: [128, 256, 512]
-      out_channels: 64
-      num_outs: 3
-      upsample_cfg:
-        mode: 'nearest'
+    cfg:
+      backbone: 
+        type: 'ResNetWrapper'
+        resnet: 'resnet18'
+        pretrained: true
+        out_conv: false
+      neck:
+        type: 'FPN'
+        in_channels: [128, 256, 512]
+        out_channels: 64
+        num_outs: 3
+        upsample_cfg:
+          mode: 'nearest'
+      head:
+        type: 'CLRHead'
+        num_priors: 192
+        refine_layers: 3
+        fc_hidden_dim: 64
+        sample_points: 36
+
     
         
 trainer:
@@ -55,7 +63,7 @@ trainer:
   logger: null
   callbacks: null
   fast_dev_run: true
-  max_epochs: null
+  max_epochs: 15
   min_epochs: null
   max_steps: -1
   min_steps: null
@@ -68,7 +76,7 @@ trainer:
   val_check_interval: null
   check_val_every_n_epoch: 1
   num_sanity_val_steps: null
-  log_every_n_steps: null
+  log_every_n_steps: 8
   enable_checkpointing: null
   enable_progress_bar: null
   enable_model_summary: null

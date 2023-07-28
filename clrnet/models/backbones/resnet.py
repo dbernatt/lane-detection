@@ -281,12 +281,14 @@ class ResNetWrapper(nn.Module):
                  in_channels=[64, 128, 256, 512],
                  cfg=None):
         super(ResNetWrapper, self).__init__()
+        print('Init ResNetWrapper...')
         self.cfg = cfg
         self.in_channels = in_channels
 
         self.model = eval(resnet)(
             pretrained=pretrained,
             in_channels=self.in_channels)
+        print('resnet model: ', self.model)
         self.out = None
         if out_conv:
             out_channel = 512
@@ -314,11 +316,11 @@ def _resnet(arch, block, layers, pretrained, **kwargs):
 
 
 def resnet18(pretrained=False, **kwargs):
-    r"""ResNet-18 model from
+    """ResNet-18 model from
     `"Deep Residual Learning for Image Recognition" <https://arxiv.org/pdf/1512.03385.pdf>`_
     Args:
         pretrained (bool): If True, returns a model pre-trained on ImageNet
         progress (bool): If True, displays a progress bar of the download to stderr
     """
-    #
+    
     return _resnet('resnet18', BasicBlock, [2, 2, 2, 2], pretrained, **kwargs)

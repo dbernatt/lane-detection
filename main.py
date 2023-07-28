@@ -5,9 +5,9 @@ import pytorch_lightning as pl
 from pytorch_lightning.cli import LightningCLI, ArgsType
 from pytorch_lightning.demos.boring_classes import DemoModel, BoringDataModule
 
-from clrnet.models import CLRNet
+# from clrnet.models import CLRNet
 from clrnet.datasets import CULaneDataModule
-from clrnet.cli import CLRNetCLI
+from clrnet.cli import CLRNetCLI, Runner
 
 data_types = {
   "CULane": "clrnet.datasets.CULaneDataModule"
@@ -31,7 +31,7 @@ def main():
   assert isinstance(data_type, (str))
 
   if data_type == data_types['CULane']:
-    cli = CLRNetCLI(CLRNet, 
+    cli = CLRNetCLI(Runner, 
                     CULaneDataModule, 
                     run=True,
                     subclass_mode_model=True, 

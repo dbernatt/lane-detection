@@ -53,6 +53,7 @@ class ToTensor(object):
         keys (Sequence[str]): Keys that need to be converted to Tensor.
     """
     def __init__(self, keys=['img', 'mask'], cfg = None):
+        print('ToTensor')
         self.keys = keys
 
     def __call__(self, sample):

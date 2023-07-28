@@ -26,11 +26,11 @@ def build_necks(cfg):
 
 
 def build_heads(cfg):
-    return build(cfg, HEADS)
+    return build(HEADS, cfg)
 
 
 def build_head(split_cfg, cfg):
-    return build(split_cfg, HEADS)
+    return build(HEADS, split_cfg)
 
 
 def build_net(cfg):

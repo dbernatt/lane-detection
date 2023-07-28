@@ -5,6 +5,9 @@ import os
 import numpy as np
 import os.path as osp
 from torchvision.transforms import Compose
+import random
+from functools import partial
+# from mmcv.parallel import collate
 
 from torchvision import transforms
 from clrnet.datasets.process.transforms import ToTensor, Normalize
@@ -31,6 +34,14 @@ class CULaneDataModule(pl.LightningDataModule):
     print('data module processes: ', processes)
     self.cfg = cfg
     self.processes = processes
+    self.culane_train_set = None
+    self.culane_val_set = None
+    self.culane_test_set = None
+
+  def worker_init_fn(worker_id, seed):
+      worker_seed = worker_id + seed
+      np.random.seed(worker_seed)
+      random.seed(worker_seed)
 
   def prepare_data(self):
     print('Preparing CULaneDataModule...')
@@ -59,8 +70,21 @@ class CULaneDataModule(pl.LightningDataModule):
 
   def train_dataloader(self):
     print('Create train dataloader...')
-    return DataLoader(self.culane_train_set, batch_size=self.cfg['batch_size'])
-    # return DataLoader(self.mnist_train, batch_size=self.batch_size)
+    # init_fn = partial(self.worker_init_fn, seed=self.cfg['seed'])
+    data_loader =  DataLoader(
+          self.culane_train_set,
+          batch_size=self.cfg['batch_size'],
+          shuffle=True,
+          num_workers=self.cfg['workers'],
+          # pin_memory=False,
+          # drop_last=False,
+          # collate_fn=partial(collate, samples_per_gpu=samples_per_gpu),
+          # worker_init_fn=init_fn
+          )
+    print('data_loader len:', len(data_loader))
+    print()
+    return data_loader
+    # return DataLoader(self.culane_train_set, batch_size=self.cfg['batch_size'])
 
   def val_dataloader(self):
       print('Create val dataloader...')

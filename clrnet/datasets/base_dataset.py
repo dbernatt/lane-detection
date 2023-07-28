@@ -41,7 +41,6 @@ class BaseDataset(Dataset):
         return len(self.data_infos)
 
     def __getitem__(self, idx):
-        print('base dataset get item...')
         data_info = self.data_infos[idx]
         img = cv2.imread(data_info['img_path'])
         img = img[self.cfg['cut_height']:, :, :]

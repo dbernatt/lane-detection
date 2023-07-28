@@ -53,12 +53,19 @@ class FPN(nn.Module):
 
     def forward(self, inputs):
         """Forward function."""
-        assert len(inputs) >= len(self.in_channels)
+        print('FPN forward')
+        # in_channels = [128, 256, 512]
+        assert len(inputs[1]) >= len(self.in_channels) 
+        print('inputs: ', inputs)
+        print('inputs shape: ', inputs.shape)
+        print('inputs len 0: ',  len(inputs[0]))
+        print('in_channels: ', self.in_channels)
+        print('len inputs-in_channels: ', len(inputs), len(self.in_channels))
 
         # remove inputes from the beginning if inputs length > num of in_channels
-        if len(inputs) > len(self.in_channels):
-          for _ in range(len(inputs) - len(self.in_channels)):
-              del inputs[0]
+        # if len(inputs[0]) > len(self.in_channels):
+        #   for _ in range(len(inputs) - len(self.in_channels)):
+        #       del inputs[0]
 
         # build laterals from start level (=0)
         laterals = []
@@ -99,12 +106,12 @@ class FPN(nn.Module):
           outs.append(self.fpn_convs[i](laterals[i]))
 
         # part 2: add extra levels
-        if self.num_outs > len(outs): # 3 > 3
-            # use max pool to get more levels on top of outputs
-            # (e.g., Faster R-CNN, Mask R-CNN)
-            if not self.add_extra_convs:
-              for i in range(self.num_outs - used_backbone_levels):
-                  outs.append(F.max_pool2d(outs[-1], 1, stride=2))
+        # if self.num_outs > len(outs): # 3 > 3
+        #     # use max pool to get more levels on top of outputs
+        #     # (e.g., Faster R-CNN, Mask R-CNN)
+        #     if not self.add_extra_convs:
+        #       for i in range(self.num_outs - used_backbone_levels):
+        #           outs.append(F.max_pool2d(outs[-1], 1, stride=2))
         
         return tuple(outs)
            

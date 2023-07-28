@@ -1,6 +1,7 @@
 from clrnet.utils import Registry, build_from_cfg
 
 import torch as nn
+from torch.utils.data import DataLoader
 from functools import partial
 import numpy as np
 import random
