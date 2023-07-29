@@ -4,6 +4,9 @@ cache/
 
 data/
 
+.eggs
+*.egg-info/
+build/
 
 *.log
 lightning_logs/
