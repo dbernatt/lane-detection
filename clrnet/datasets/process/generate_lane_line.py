@@ -7,10 +7,6 @@ from imgaug.augmentables.segmaps import SegmentationMapsOnImage
 from scipy.interpolate import InterpolatedUnivariateSpline
 from clrnet.datasets.process.transforms import CLRTransforms
 
-from ..registry import PROCESS
-
-
-@PROCESS.register_module
 class GenerateLaneLine(object):
     def __init__(self, transforms=None, cfg=None, training=True):
         print('Init Generate Lane Line')

@@ -1,6 +1,5 @@
 import torch
 import numpy as np
-from ..registry import PROCESS
 
 def to_tensor(data):
     """Convert objects of various python types to :obj:`torch.Tensor`.
@@ -24,7 +23,6 @@ def to_tensor(data):
     else:
         raise TypeError(f'type {type(data)} cannot be converted to tensor.')
 
-@PROCESS.register_module
 class Normalize(object):
     def __init__(self, img_norm):
         print('Normalize')
@@ -45,7 +43,6 @@ class Normalize(object):
 
         return sample
 
-@PROCESS.register_module
 class ToTensor(object):
     """Convert some results to :obj:`torch.Tensor` by given keys.
 
@@ -71,7 +68,6 @@ class ToTensor(object):
     def __repr__(self):
         return self.__class__.__name__ + f'(keys={self.keys})'
 
-@PROCESS.register_module
 class RandomUDoffsetLABEL(object):
     def __init__(self, max_offset, cfg=None):
         self.max_offset = max_offset

@@ -10,13 +10,34 @@ from functools import partial
 # from mmcv.parallel import collate
 
 from torchvision import transforms
-from clrnet.datasets.process.transforms import ToTensor, Normalize
 from clrnet.datasets import CULaneDataset
-from clrnet.datasets.process import Process
 from torch.utils.data.dataloader import default_collate
 
+class CULaneDataModuleParams(object):
+  def __init__(self, data_root, 
+                      batch_size, 
+                      img_w, 
+                      img_h,
+                      cut_height,
+                      work_dirs,
+                      img_norm,
+                      num_points,
+                      max_lanes,
+                      workers,
+                      ):
+    self.data_root = data_root
+    self.batch_size = batch_size
+    self.img_w = img_w
+    self.img_h = img_h
+    self.cut_height = cut_height
+    self.work_dirs = work_dirs
+    self.img_norm = img_norm
+    self.num_points = num_points
+    self.max_lanes = max_lanes
+    self.workers = workers
+
 class CULaneDataModule(pl.LightningDataModule):
-  def __init__(self, cfg, processes):
+  def __init__(self, cfg: CULaneDataModuleParams, processes):
     super(CULaneDataModule, self).__init__()
     print('Init CULaneDataModule...')
     self.save_hyperparameters()

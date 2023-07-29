@@ -7,25 +7,23 @@ from torch.utils.data import Dataset
 import torchvision
 import logging
 from clrnet.utils.visualization import imshow_lanes
-from clrnet.datasets.process import Process
-from .registry import DATASETS
+from .process import Process
 
 # from mmcv.parallel import DataContainer as DC
 
-@DATASETS.register_module
 class BaseDataset(Dataset):
     def __init__(self, cfg, split, processes):
-        print('init base dataset...')
+        print('Init BaseDataset...')
         self.cfg = cfg
-
+        self.processes = processes
         print('base dataset cfg: ', self.cfg)
-        print('processes: ', processes)
+        print('processes: ', self.processes)
         # self.logger = logging.getLogger(__name__)
         print('basic dataset: ', cfg)
-        self.work_dirs = cfg['work_dirs']
-        self.data_root = cfg['data_root']
+        self.work_dirs = cfg.work_dirs
+        self.data_root = cfg.data_root
         self.training = 'train' in split
-        self.processes = Process(processes, cfg)
+        self.processes = Process(self.processes)
 
     def view(self, predictions, img_metas):
         img_metas = [item for img_meta in img_metas.data for item in img_meta]
@@ -43,7 +41,7 @@ class BaseDataset(Dataset):
     def __getitem__(self, idx):
         data_info = self.data_infos[idx]
         img = cv2.imread(data_info['img_path'])
-        img = img[self.cfg['cut_height']:, :, :]
+        img = img[self.cfg.cut_height:, :, :]
         sample = data_info.copy()
         sample.update({'img': img})
 
@@ -52,15 +50,15 @@ class BaseDataset(Dataset):
             if len(label.shape) > 2:
                 label = label[:, :, 0]
             label = label.squeeze()
-            label = label[self.cfg['cut_height']:, :]
+            label = label[self.cfg.cut_height:, :]
             sample.update({'mask': label})
 
-            if self.cfg['cut_height'] != 0:
+            if self.cfg.cut_height != 0:
                 new_lanes = []
                 for i in sample['lanes']:
                     lanes = []
                     for p in i:
-                        lanes.append((p[0], p[1] - self.cfg['cut_height']))
+                        lanes.append((p[0], p[1] - self.cfg.cut_height))
                     new_lanes.append(lanes)
                 sample.update({'lanes': new_lanes})
 

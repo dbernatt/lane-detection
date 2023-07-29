@@ -15,10 +15,7 @@ from clrnet.models.utils.roi_gather import ROIGather, LinearModule
 from clrnet.models.utils.seg_decoder import SegDecoder
 from clrnet.models.utils.dynamic_assign import assign
 from clrnet.models.losses.lineiou_loss import liou_loss
-from ..registry import HEADS
 
-
-@HEADS.register_module
 class CLRHead(nn.Module):
     def __init__(self,
                  num_points=72,
@@ -29,6 +26,7 @@ class CLRHead(nn.Module):
                  refine_layers=3,
                  sample_points=36):
         super(CLRHead, self).__init__()
+        print('Init CLRHead...')
         self.img_w = self.img_w
         self.img_h = self.img_h
         self.n_strips = num_points - 1

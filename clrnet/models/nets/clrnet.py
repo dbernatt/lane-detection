@@ -6,9 +6,6 @@ import torch.functional as F
 
 import torchvision.models as models
 
-from ..registry import build_backbones, build_necks, build_heads
-
-
 class Encoder:
   def __init__(self):
     super().__init__()

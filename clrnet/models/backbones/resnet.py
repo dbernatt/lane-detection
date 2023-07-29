@@ -3,7 +3,6 @@ from torch import nn
 import torch.nn.functional as F
 from typing import Any, Callable, List, Optional, Type, Union
 from torch.hub import load_state_dict_from_url
-from clrnet.models.registry import BACKBONES
 
 model_urls = {
     'resnet18':
@@ -270,7 +269,6 @@ class ResNet(nn.Module):
     def forward(self, x):
         return self._forward_impl(x)
 
-@BACKBONES.register_module
 class ResNetWrapper(nn.Module):
     def __init__(self,
                  resnet='resnet18',

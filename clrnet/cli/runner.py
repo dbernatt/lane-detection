@@ -1,20 +1,33 @@
 import torch
 import torch.nn as nn
 import pytorch_lightning as pl
-from torch import _cufft_get_plan_cache_size
+from torch import DictType, _cufft_get_plan_cache_size
 import torch.functional as F
 import torchvision.models as models
+from collections.abc import MutableMapping
 
 from clrnet.models.nets import Detector
 
+class RunnerParams(object):
+  def __init__(self, backbone, heads = None, neck = None, *args, **kwargs):
+      print('Init RunnerParams...'
+      )
+      print('backbone: ', backbone)
+      print('heads: ', heads)
+      print('neck: ', neck)
+
+      self.backbone = backbone
+      self.neck = neck
+      self.heads = heads
+
 class Runner(pl.LightningModule):
 
-  def __init__(self, cfg, batch_size = 16):
+  def __init__(self, cfg: RunnerParams, processes, batch_size = 16):
     super(Runner, self).__init__()
     print('Init Runner...')
-    print('cfg = ', cfg)
-    self.training = True
     self.cfg = cfg
+    self.processes = processes
+    print('backbone = ', cfg.backbone)
     self.net = Detector(self.cfg)
 
   def forward(self, x):

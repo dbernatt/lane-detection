@@ -4,56 +4,70 @@ seed_everything: true
 data:
   class_path: clrnet.datasets.CULaneDataModule
   init_args:
-    cfg: 
-      data_type: 'CULane'
-      data_root: 'data/CULane'
-      batch_size: 24
-      img_w: 400
-      img_h: 160
-      cut_height: 73
-      work_dirs: 'work_dirs/clr/r18_culane'
-      img_norm: 
-        mean: [103.939, 116.779, 123.68]
-        std: [1., 1., 1.]
-      num_points: 72
-      max_lanes: 4
-      workers: 2
-
+    cfg:
+      class_path: clrnet.datasets.CULaneDataModuleParams
+      init_args:
+        data_root: 'data/CULane'
+        batch_size: 24
+        img_w: 400
+        img_h: 160
+        cut_height: 73
+        work_dirs: 'work_dirs/clr/r18_culane'
+        img_norm: 
+          mean: [103.939, 116.779, 123.68]
+          std: [1., 1., 1.]
+        num_points: 72
+        max_lanes: 4
+        workers: 2
     processes:
-      train:
-        - type: 'GenerateLaneLine'
-          transforms: null
-          cfg: ${data.init_args.cfg}
+      class_path: clrnet.datasets.Process
+      init_args:
+        processes: null
+        train:
+          - GenerateLaneLine: 
+              class_path: clrnet.datasets.processes.GenerateLaneLine
+              init_args:
+                tranforms: null
+                cfg: null
+                training: true
         #- type: 'Normalize'
         #  img_norm: ${data.init_args.cfg.img_norm}
-        - type: 'ToTensor'
-          keys: ['img', 'lane_line', 'seg']
+          - ToTensor:
+              class_path: clrnet.datasets.transforms.ToTensor
+              init_args:
+                keys: ['img', 'lane_line', 'seg']
+                cfg: null
 
 model:
-  class_path: clrnet.cli.Runner
-  init_args:
-    cfg:
-      backbone: 
-        type: 'ResNetWrapper'
-        resnet: 'resnet18'
-        pretrained: true
-        out_conv: false
-      neck:
-        type: 'FPN'
-        in_channels: [128, 256, 512]
-        out_channels: 64
-        num_outs: 3
-        upsample_cfg:
-          mode: 'nearest'
-      head:
-        type: 'CLRHead'
-        num_priors: 192
-        refine_layers: 3
-        fc_hidden_dim: 64
-        sample_points: 36
+  class_path: Runner
+  init_args: 
+    cfg: 
+      class_path: clrnet.cli.RunnerParams
+      init_args:
+        backbone:
+          class_path: clrnet.models.backbones.ResNetWrapper
+          init_args:
+            resnet: 'resnet18'
+            pretrained: true
+            out_conv: false
+            
+        neck:
+          class_path: clrnet.models.necks.FPN
+          init_args:
+            in_channels: [128, 256, 512]
+            out_channels: 64
+            num_outs: 3
+            upsample_cfg: 
+              mode: 'nearest'
 
-    
-        
+        heads:
+          class_path: clrnet.models.heads.CLRHead
+          init_args:
+            num_priors: 192
+            refine_layers: 3
+            fc_hidden_dim: 64
+            sample_points: 36
+      
 trainer:
   accelerator: auto
   strategy: auto

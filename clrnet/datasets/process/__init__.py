@@ -1,5 +1,5 @@
-from .process import Process
 from .transforms import ToTensor, Normalize
+from .process import Process
 
 from .generate_lane_line import GenerateLaneLine
 
