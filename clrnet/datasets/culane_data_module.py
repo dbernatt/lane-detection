@@ -11,6 +11,7 @@ from functools import partial
 
 from torchvision import transforms
 from clrnet.datasets import CULaneDataset
+from clrnet.datasets.process import Process
 from torch.utils.data.dataloader import default_collate
 
 class CULaneDataModuleParams(object):
@@ -94,9 +95,9 @@ class CULaneDataModule(pl.LightningDataModule):
     # init_fn = partial(self.worker_init_fn, seed=self.cfg['seed'])
     data_loader =  DataLoader(
           self.culane_train_set,
-          batch_size=self.cfg['batch_size'],
+          batch_size=self.cfg.batch_size,
           shuffle=True,
-          num_workers=self.cfg['workers'],
+          num_workers=self.cfg.workers,
           # pin_memory=False,
           # drop_last=False,
           # collate_fn=partial(collate, samples_per_gpu=samples_per_gpu),

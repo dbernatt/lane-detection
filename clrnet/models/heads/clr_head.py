@@ -24,7 +24,8 @@ class CLRHead(nn.Module):
                  num_priors=192,
                  num_fc=2,
                  refine_layers=3,
-                 sample_points=36):
+                 sample_points=36
+                 ):
         super(CLRHead, self).__init__()
         print('Init CLRHead...')
         self.img_w = self.img_w

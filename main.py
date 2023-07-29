@@ -14,25 +14,37 @@ data_types = {
 }
 
 def main():
-  parser = argparse.ArgumentParser()
-  args = parse_args()
-  config = load_cfg(args.config)
-  print('config = ', config)
-  data = config.get('data')
+  # parser = argparse.ArgumentParser()
+  # args = parse_args()
+  # config = load_cfg(args.config)
+  # print('config = ', config)
+  # data = config.get('data')
   
-  if data == None:
-    raise ValueError('Missing data from config!')
+  # if data == None:
+  #   raise ValueError('Missing data from config!')
 
-  data_type = data.get('class_path')
+  # data_type = data.get('class_path')
   
-  if data_type == None:
-    raise ValueError('Missing class_path from data!')
+  # if data_type == None:
+  #   raise ValueError('Missing class_path from data!')
   
-  assert isinstance(data_type, (str))
+  # assert isinstance(data_type, (str))
 
-  if data_type == data_types['CULane']:
-    cli = CLRNetCLI(Runner, 
-                    CULaneDataModule, 
+  # if data_type == data_types['CULane']:
+  #   cli = CLRNetCLI(Runner, 
+  #                   CULaneDataModule, 
+  #                   run=True,
+  #                   subclass_mode_model=True, 
+  #                   subclass_mode_data=True,
+  #                   parser_kwargs={
+  #                     "default_config_files": ["/configs/clr_culane_resnet18.yaml"],
+  #                     "parser_mode": "omegaconf"
+  #                   })
+    
+  # else:
+  #   raise ValueError("'{}' data_type not found!".format(data_type))
+
+  cli = CLRNetCLI(Runner, 
                     run=True,
                     subclass_mode_model=True, 
                     subclass_mode_data=True,
@@ -41,8 +53,6 @@ def main():
                       "parser_mode": "omegaconf"
                     })
     
-  else:
-    raise ValueError("'{}' data_type not found!".format(data_type))
 
 def load_cfg(filename):
   try:

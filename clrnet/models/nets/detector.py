@@ -10,6 +10,7 @@ class Detector(nn.Module):
     self.backbone = cfg.backbone
     self.neck = cfg.neck
     self.heads = cfg.heads
+    print('neck: ', self.neck)
     print('heads: ', self.heads)
     # self.aggregator = build_aggregator(cfg) if cfg.haskey('aggregator') else None
     
@@ -31,7 +32,7 @@ class Detector(nn.Module):
         print('fea.shape: ', fea.shape)
         fea = self.neck(fea)
 
-    print('')
+    print('heads: ', self.heads)
     output = self.heads(fea, batch=batch)
     if self.training:
         output = self.heads(fea, batch=batch)

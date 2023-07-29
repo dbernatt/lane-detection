@@ -2,6 +2,7 @@ import warnings
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from mmcv.cnn import ConvModule
 
 class FPN(nn.Module):
     def __init__(self,
@@ -10,7 +11,15 @@ class FPN(nn.Module):
                  num_outs,
                  start_level=0,
                  end_level=-1,
-                 upsample_cfg=dict(mode='nearest')):
+                 upsample_cfg=dict(mode='nearest'),
+                 no_norm_on_lateral=False,
+                 conv_cfg=None,
+                 norm_cfg=None,
+                 attention=False,
+                 act_cfg=None,
+                 init_cfg=dict(type='Xavier',
+                               layer='Conv2d',
+                               distribution='uniform')):
         super(FPN, self).__init__()
         assert isinstance(in_channels, list)
         self.in_channels = in_channels # [128, 256, 512]
@@ -34,14 +43,22 @@ class FPN(nn.Module):
         self.fpn_convs = nn.ModuleList()
 
         for i in range(self.start_level, self.backbone_end_level):
-            l_conv = nn.Conv2d(
+            l_conv = ConvModule(
                 in_channels[i], # [128, 256, 512]
                 out_channels, # 64
-                kernel_size=1)
-            fpn_conv = nn.Conv2d(out_channels, # 64
+                kernel_size=1,
+                conv_cfg=conv_cfg,
+                norm_cfg=norm_cfg if not self.no_norm_on_lateral else None,
+                act_cfg=act_cfg,
+                inplace=False)
+            fpn_conv = ConvModule(out_channels, # 64
                                   out_channels, # 64
                                   kernel_size=3,
-                                  padding=1)  
+                                  padding=1,
+                                  conv_cfg=conv_cfg,
+                                  norm_cfg=norm_cfg,
+                                  act_cfg=act_cfg,
+                                  inplace=False)  
 
         self.lateral_convs.append(l_conv) # 3 Conv2ds
         self.fpn_convs.append(fpn_conv) # 3 Conv2ds

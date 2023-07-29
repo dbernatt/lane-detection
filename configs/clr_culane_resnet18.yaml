@@ -20,53 +20,48 @@ data:
         max_lanes: 4
         workers: 2
     processes:
-      class_path: clrnet.datasets.Process
-      init_args:
-        processes: null
-        train:
-          - GenerateLaneLine: 
-              class_path: clrnet.datasets.processes.GenerateLaneLine
-              init_args:
-                tranforms: null
-                cfg: null
-                training: true
-        #- type: 'Normalize'
-        #  img_norm: ${data.init_args.cfg.img_norm}
-          - ToTensor:
-              class_path: clrnet.datasets.transforms.ToTensor
-              init_args:
-                keys: ['img', 'lane_line', 'seg']
-                cfg: null
+      train:
+        - GenerateLaneLine: 
+            class_path: clrnet.datasets.process.GenerateLaneLine
+            init_args:
+              tranforms: null
+              cfg: null
+              training: true
+#         #- type: 'Normalize'
+#         #  img_norm: ${data.init_args.cfg.img_norm}
+#           - ToTensor:
+#               class_path: clrnet.datasets.transforms.ToTensor
+#               init_args:
+#                 keys: ['img', 'lane_line', 'seg']
+#                 cfg: null
 
 model:
-  class_path: Runner
-  init_args: 
-    cfg: 
-      class_path: clrnet.cli.RunnerParams
+  cfg: 
+    backbone:
+      class_path: clrnet.models.backbones.ResNetWrapper
       init_args:
-        backbone:
-          class_path: clrnet.models.backbones.ResNetWrapper
-          init_args:
-            resnet: 'resnet18'
-            pretrained: true
-            out_conv: false
-            
-        neck:
-          class_path: clrnet.models.necks.FPN
-          init_args:
-            in_channels: [128, 256, 512]
-            out_channels: 64
-            num_outs: 3
-            upsample_cfg: 
-              mode: 'nearest'
-
-        heads:
-          class_path: clrnet.models.heads.CLRHead
-          init_args:
-            num_priors: 192
-            refine_layers: 3
-            fc_hidden_dim: 64
-            sample_points: 36
+        resnet: 'resnet18'
+        pretrained: true
+        out_conv: false
+    neck:
+      class_path: clrnet.models.necks.FPN
+      init_args:
+        in_channels: [128, 256, 512]
+        out_channels: 64
+        num_outs: 3
+        upsample_cfg: 
+          mode: 'nearest'
+    heads:
+      class_path: clrnet.models.heads.CLRHead
+      init_args:
+        num_priors: 192
+        refine_layers: 3
+        fc_hidden_dim: 64
+        sample_points: 36
+    net:
+      class_path: clrnet.models.nets.Detector
+      init_args:
+        cfg: ${model.cfg}
       
 trainer:
   accelerator: auto
