@@ -1,1 +1,1 @@
-from .clr_head import CLRHead
+from .clr_head import CLRHead, CLRHeadParams

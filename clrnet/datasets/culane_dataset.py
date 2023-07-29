@@ -9,6 +9,8 @@ import logging
 import pickle as pkl
 from torch.utils.data import Dataset
 
+from .registry import DATASETS
+
 LIST_FILE = {
     'train': 'list/train_gt.txt',
     'val': 'list/val.txt',
@@ -27,6 +29,7 @@ CATEGORYS = {
     'night': 'list/test_split/test8_night.txt',
 }
 
+@DATASETS.register_module
 class CULaneDataset(BaseDataset):
   def __init__(self, cfg, split, processes):
     print('Init CULaneDataset...')
@@ -94,7 +97,7 @@ class CULaneDataset(BaseDataset):
     return infos
 
   def get_prediction_string(self, pred):
-      ys = np.arange(270, 590, 8) / self.cfg.ori_img_h
+      ys = np.arange(self.cfg.cut_height, self.cfg.ori_img_h, 8) / self.cfg.ori_img_h
       out = []
       for lane in pred:
           xs = lane(ys)

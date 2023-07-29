@@ -1,2 +1,1 @@
-from .clrnet import CLRNet
-from .detector import Detector
+from .clrnet import CLRNet, CLRNetParams

@@ -19,13 +19,19 @@ class FPN(nn.Module):
                  act_cfg=None,
                  init_cfg=dict(type='Xavier',
                                layer='Conv2d',
-                               distribution='uniform')):
+                               distribution='uniform')) -> None:
         super(FPN, self).__init__()
         assert isinstance(in_channels, list)
         self.in_channels = in_channels # [128, 256, 512]
         self.out_channels = out_channels # 64
         self.num_ins = len(in_channels) # 3
         self.num_outs = num_outs # 3
+        self.no_norm_on_lateral = no_norm_on_lateral
+        self.conv_cfg = conv_cfg
+        self.norm_cfg = norm_cfg
+        self.attention = attention
+        self.act_cfg = act_cfg
+        self.init_cfg = init_cfg
 
         if end_level == -1:
             self.backbone_end_level = self.num_ins # 3

@@ -13,49 +13,68 @@ from torchvision import transforms
 from clrnet.datasets import CULaneDataset
 from clrnet.datasets.process import Process
 from torch.utils.data.dataloader import default_collate
+from clrnet.utils import Dict2Class
 
-class CULaneDataModuleParams(object):
-  def __init__(self, data_root, 
-                      batch_size, 
-                      img_w, 
-                      img_h,
-                      cut_height,
-                      work_dirs,
-                      img_norm,
-                      num_points,
-                      max_lanes,
-                      workers,
-                      ):
-    self.data_root = data_root
-    self.batch_size = batch_size
-    self.img_w = img_w
-    self.img_h = img_h
-    self.cut_height = cut_height
-    self.work_dirs = work_dirs
-    self.img_norm = img_norm
-    self.num_points = num_points
-    self.max_lanes = max_lanes
-    self.workers = workers
+# class CULaneDataModuleParams(object):
+#   def __init__(self, data_root, 
+#                       batch_size, 
+#                       img_w, 
+#                       img_h,
+#                       cut_height,
+#                       work_dirs,
+#                       img_norm,
+#                       num_points,
+#                       max_lanes,
+#                       workers
+#                       ):
+#     self.data_root = data_root
+#     self.batch_size = batch_size
+#     self.img_w = img_w
+#     self.img_h = img_h
+#     self.cut_height = cut_height
+#     self.work_dirs = work_dirs
+#     self.img_norm = img_norm
+#     self.num_points = num_points
+#     self.max_lanes = max_lanes
+#     self.workers = workers
 
 class CULaneDataModule(pl.LightningDataModule):
-  def __init__(self, cfg: CULaneDataModuleParams, processes):
+  def __init__(self, data_root, 
+                     batch_size, 
+                     img_w, 
+                     img_h,
+                     ori_img_w,
+                     ori_img_h, 
+                     cut_height,
+                     work_dirs,
+                     img_norm,
+                     num_points,
+                     max_lanes,
+                     workers,
+                     processes,
+                     *args,
+                     **kwargs):
     super(CULaneDataModule, self).__init__()
     print('Init CULaneDataModule...')
     self.save_hyperparameters()
 
-    # self.data_type = data_type
-    # self.data_root = data_root
-    # self.batch_size = batch_size
-    # self.img_w = img_w
-    # self.img_h = img_h
-    # self.cut_height = cut_height
-    # self.img_norm = img_norm
-    # self.work_dirs = work_dirs
-    
-    print('data module cfg: ', cfg)
-    print('data module processes: ', processes)
-    self.cfg = cfg
+    self.cfg = Dict2Class(dict(data_root=data_root,
+                batch_size=batch_size,
+                img_w=img_w,
+                img_h=img_h,
+                ori_img_w=ori_img_w,
+                ori_img_h=ori_img_h,
+                cut_height=cut_height,
+                work_dirs=work_dirs,
+                img_norm=img_norm,
+                num_points=num_points,
+                max_lanes=max_lanes,
+                workers=workers
+              ))
     self.processes = processes
+    print('data module cfg: ', self.cfg)
+    print('data module processes: ', self.processes)
+
     self.culane_train_set = None
     self.culane_val_set = None
     self.culane_test_set = None
@@ -104,18 +123,13 @@ class CULaneDataModule(pl.LightningDataModule):
           # worker_init_fn=init_fn
           )
     print('data_loader len:', len(data_loader))
-    print()
     return data_loader
-    # return DataLoader(self.culane_train_set, batch_size=self.cfg['batch_size'])
 
   def val_dataloader(self):
-      print('Create val dataloader...')
-      # return DataLoader(self.mnist_val, batch_size=self.batch_size)
+    print('Create val dataloader...')
 
   def test_dataloader(self):
-      print('Create test dataloader...')
-      # return DataLoader(self.mnist_test, batch_size=self.batch_size)
+    print('Create test dataloader...')
 
   def predict_dataloader(self):
-      print('Create predict dataloader...')
-      # return DataLoader(self.mnist_predict, batch_size=self.batch_size)
+    print('Create predict dataloader...')

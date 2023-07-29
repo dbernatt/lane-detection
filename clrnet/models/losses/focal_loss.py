@@ -7,6 +7,22 @@ import torch.nn.functional as F
 
 # Source: https://github.com/kornia/kornia/blob/f4f70fefb63287f72bc80cd96df9c061b1cb60dd/kornia/losses/focal.py
 
+
+class SoftmaxFocalLoss(nn.Module):
+    def __init__(self, gamma, ignore_lb=255, *args, **kwargs):
+        super(SoftmaxFocalLoss, self).__init__()
+        self.gamma = gamma
+        self.nll = nn.NLLLoss(ignore_index=ignore_lb)
+
+    def forward(self, logits, labels):
+        scores = F.softmax(logits, dim=1)
+        factor = torch.pow(1. - scores, self.gamma)
+        log_score = F.log_softmax(logits, dim=1)
+        log_score = factor * log_score
+        loss = self.nll(log_score, labels)
+        return loss
+
+
 def one_hot(labels: torch.Tensor,
             num_classes: int,
             device: Optional[torch.device] = None,

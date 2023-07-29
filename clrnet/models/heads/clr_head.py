@@ -15,21 +15,50 @@ from clrnet.models.utils.roi_gather import ROIGather, LinearModule
 from clrnet.models.utils.seg_decoder import SegDecoder
 from clrnet.models.utils.dynamic_assign import assign
 from clrnet.models.losses.lineiou_loss import liou_loss
+from collections.abc import MutableMapping
+
+
+class CLRHeadParams(object):
+  def __init__(self, 
+               log_interval,
+               num_classes,
+               ignore_label,
+               bg_weight,
+               lr_update_by_epoch):
+    self.log_interval = log_interval
+    self.num_classes = num_classes
+    self.ignore_label = ignore_label
+    self.bg_weight = bg_weight
+    self.lr_update_by_epoch = lr_update_by_epoch
+
+  def __str__(self) -> str:
+    return str(dict(
+      log_interval=self.log_interval, 
+      num_classes=self.num_classes, 
+      ignore_label=self.ignore_label, 
+      bg_weight=self.bg_weight,
+      lr_update_by_epoch=self.lr_update_by_epoch
+    ))
 
 class CLRHead(nn.Module):
-    def __init__(self,
-                 num_points=72,
-                 prior_feat_channels=64,
-                 fc_hidden_dim=64,
-                 num_priors=192,
-                 num_fc=2,
-                 refine_layers=3,
-                 sample_points=36
-                 ):
+    def __init__(self, 
+               cfg: CLRHeadParams,  
+               num_points=72,
+               prior_feat_channels=64,
+               fc_hidden_dim=64,
+               num_priors=192,
+               num_fc=2,
+               refine_layers=3,
+               sample_points=36,
+               img_w=400,
+               img_h=160):
         super(CLRHead, self).__init__()
         print('Init CLRHead...')
-        self.img_w = self.img_w
-        self.img_h = self.img_h
+        print('img_w, img_h= ', img_w, img_h)
+        self.cfg = cfg
+        print('cfg = ', self.cfg)
+        self.img_w = img_w
+        self.img_h = img_h
         self.n_strips = num_points - 1
         self.n_offsets = num_points
         self.num_priors = num_priors

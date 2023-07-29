@@ -8,22 +8,22 @@ import torchvision
 import logging
 from clrnet.utils.visualization import imshow_lanes
 from .process import Process
+from .registry import DATASETS
 
 # from mmcv.parallel import DataContainer as DC
 
+@DATASETS.register_module
 class BaseDataset(Dataset):
     def __init__(self, cfg, split, processes):
         print('Init BaseDataset...')
         self.cfg = cfg
-        self.processes = processes
-        print('base dataset cfg: ', self.cfg)
-        print('processes: ', self.processes)
-        # self.logger = logging.getLogger(__name__)
-        print('basic dataset: ', cfg)
-        self.work_dirs = cfg.work_dirs
-        self.data_root = cfg.data_root
+        self.work_dirs = self.cfg.work_dirs
+        self.data_root = self.cfg.data_root
         self.training = 'train' in split
-        self.processes = Process(self.processes)
+
+        print('BaseDataset cfg: ', self.cfg)
+        print('BaseDataset processes: ', processes)
+        self.processes = Process(processes)
 
     def view(self, predictions, img_metas):
         img_metas = [item for img_meta in img_metas.data for item in img_meta]

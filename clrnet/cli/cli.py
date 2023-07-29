@@ -1,3 +1,4 @@
+import torch
 from pytorch_lightning.cli import LightningCLI, ArgsType
 from jsonargparse import lazy_instance
 from typing import Dict
@@ -54,11 +55,15 @@ class CLRNetCLI(LightningCLI):
     #     super().run()
 
     def add_arguments_to_parser(self, parser):
-        print('parser = ', parser)
-        # parser.link_arguments("data.init_args.cfg.init_args.batch_size", "model.init_args.batch_size")
-        # parser.link_arguments("data.init_args.cfg", "model.init_args.cfg")
+      print('parser = ', parser)
+      # parser.add_optimizer_args(torch.optim.Adam)
+      parser.link_arguments("data.init_args.cfg.init_args.img_w", "model.init_args.heads.init_args.img_w")
+      parser.link_arguments("data.init_args.cfg.init_args.img_h", "model.init_args.heads.init_args.img_h")
+      # parser.link_arguments("data.init_args.cfg.init_args.num_classes", "model.init_args.heads.init_args.num_classes")
+      # parser.link_arguments("data.init_args.cfg.init_args.batch_size", "model.init_args.batch_size")
+      # parser.link_arguments("data.init_args.cfg", "model.init_args.cfg")
 
-        # parser.link_arguments("data.batch_size", "model.batch_size", apply_on='instantiate')
+      # parser.link_arguments("data.batch_size", "model.batch_size", apply_on='instantiate')
 
     # def add_arguments_to_parser(self, parser):
       # parser.add_subcommands(required=False, dest='fit')

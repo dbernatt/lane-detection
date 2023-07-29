@@ -5,39 +5,52 @@ from torch import _cufft_get_plan_cache_size
 import torch.functional as F
 
 import torchvision.models as models
+from clrnet.models.heads import CLRHead
+from clrnet.models.necks import FPN
+from clrnet.models.backbones import ResNetWrapper
 
 class Encoder:
   def __init__(self):
     super().__init__()
 
-
 class Decoder:
   def __init__(self):
     super().__init__()
 
+class CLRNetParams(object):
+  def __init__(self, backbone, *args, **kwargs):
+    print('Init CLRNetParams...')
+    print('backbone: ', backbone)
+    # print('heads: ', heads)
+    # print('neck: ', neck)
+
+    self.backbone = backbone
+    # self.neck = neck
+    # self.heads = heads
+
 class CLRNet(pl.LightningModule):
 
-  def __init__(self, 
-                backbone, 
-                neck, 
-                head,
-                batch_size = 16
-                ):
-    super(CLRNet, self).__init__()
-    print('Init CLRNet...')
-    self.training = True
-    self.batch_size = batch_size
-
+  def __init__(self, backbone: ResNetWrapper, 
+                     neck: FPN | None, 
+                     heads: CLRHead):
+    
+    super().__init__()
     print('backbone = ', backbone)
-    self.backbone = build_backbones(backbone)
+    self.backbone = backbone
+    self.save_hyperparameters(ignore=['backbone', 'neck', 'heads'])
+    # print('kwargs: ', kwargs)
+    # print('args: ', kwaprint('Init CLRNet...')rgs)
 
     print('neck = ', neck)   
-    self.neck = build_necks(neck)
+    self.neck = neck
+    
+    print('head = ', heads)
+    self.heads = heads
 
-    self.net = nn.Sequential(self.backbone, self.neck)
+    print('Init CLRNet Done.')
 
-    # print('head = ', head)
-    # self.heads = build_heads(head)
+    # self.net = nn.Sequential(self.backbone, self.neck)
+
 
   # def resume(self):
   #   if not self.cfg.load_from and not self.cfg.finetune_from:
