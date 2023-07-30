@@ -18,7 +18,7 @@ data:
     processes:
       train:
         - GenerateLaneLine: 
-            tranforms: null
+            transforms: null
             cfg: null
             training: true
         - ToTensor:
