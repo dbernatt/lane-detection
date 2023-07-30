@@ -17,17 +17,6 @@ class Decoder:
   def __init__(self):
     super().__init__()
 
-class CLRNetParams(object):
-  def __init__(self, backbone, *args, **kwargs):
-    print('Init CLRNetParams...')
-    print('backbone: ', backbone)
-    # print('heads: ', heads)
-    # print('neck: ', neck)
-
-    self.backbone = backbone
-    # self.neck = neck
-    # self.heads = heads
-
 class CLRNet(pl.LightningModule):
 
   def __init__(self, backbone: ResNetWrapper, 
@@ -38,8 +27,6 @@ class CLRNet(pl.LightningModule):
     print('backbone = ', backbone)
     self.backbone = backbone
     self.save_hyperparameters(ignore=['backbone', 'neck', 'heads'])
-    # print('kwargs: ', kwargs)
-    # print('args: ', kwaprint('Init CLRNet...')rgs)
 
     print('neck = ', neck)   
     self.neck = neck
@@ -47,7 +34,6 @@ class CLRNet(pl.LightningModule):
     print('head = ', heads)
     self.heads = heads
     self.aggregator = None
-
 
     print('Init CLRNet Done.')
 
@@ -80,7 +66,7 @@ class CLRNet(pl.LightningModule):
     seg = batch['seg']
     meta = batch['meta']
     print('img len: ', len(img))
-    y_hat = self(img)
+    y_hat = self(batch)
     print('training step after net')
     loss = nn.CrossEntropyLoss(y_hat, seg)
     self.log("train_loss", loss, on_step=True, on_epoch=True, prog_bar=True, logger=True)

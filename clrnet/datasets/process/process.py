@@ -17,10 +17,8 @@ class Process(object):
     for process in processes:
         if isinstance(process, dict):
             print('process: ', process)
-            # process_namespace = next(iter(process.values()))
-            # print(process_namespace)
-            # process_dict = vars(process_namespace)
-            process = build_from_cfg(process,
+            p_key = list(process.keys())[-1]
+            process = build_from_cfg(process[p_key],
                                       PROCESS,
                                       default_args=None)
             self.processes.append(process)

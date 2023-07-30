@@ -18,7 +18,10 @@ data:
       workers: 2
     processes:
       train:
-        - GenerateLaneLine: 
+        - generateLaneLine:
+            type: 'GenerateLaneLine'
+            cfg: ${data.init_args.cfg}
+            training: true
             transforms: 
               - resize:
                   name: 'Resize'
@@ -40,21 +43,47 @@ data:
               - multiplyAndAddToBrightness:
                   name: 'MultiplyAndAddToBrightness'
                   parameters:
-                    mul: !!python/tuple [0.85, 1.15]
-                    add: !!python/tuple [-10, 10]
+                    mul: [0.85, 1.15]
+                    add: [-10, 10]
                   p: 0.6
               - addToHueAndSaturation:
                   name: 'AddToHueAndSaturation'
                   parameters: 
-                    value: !!python/tuple [-10, 10]
-              
-            cfg: ${data.init_args.cfg}
-            training: true
+                    value: [-10, 10]
+                  p: 0.7
+              - oneOf:
+                  name: 'OneOf'
+                  transforms:
+                    - motionBlur:
+                        name: 'MotionBlur'
+                        parameters:
+                          k: [3, 5]
+                    - medianBlur:
+                        name: 'MedianBlur'
+                        parameters: 
+                          k: [3, 5]
+                  p: 0.2
+              - affine:
+                  name: 'Affine'
+                  parameters:
+                    translate_percent: 
+                      x: [-0.1, 0.1]
+                      y: [-0.1, 0.1]
+                    rotate: [-10, 10]
+                    scale: [0.8, 1.2]
+                  p: 0.7
+              - resize:
+                  name: 'Resize'
+                  parameters: 
+                    size: 
+                      height: ${data.init_args.cfg.img_h}
+                      width: ${data.init_args.cfg.img_w}
+                  p: 1.0             
+        #- Normalize:
+        #  img_norm: ${data.init_args.cfg.img_norm}
         - ToTensor:
             keys: ['img', 'lane_line', 'seg']
             cfg: ${data.init_args.cfg}
-          #- Normalize:
-          #  img_norm: ${data.init_args.cfg.img_norm}
 
 model:
   class_path: CLRNet

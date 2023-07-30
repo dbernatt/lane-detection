@@ -31,11 +31,15 @@ class GenerateLaneLine(object):
         print('Elotte: ', transforms is None)
         if transforms is None:
             print('transforms is: ', transforms)
-            # transforms = CLRTransforms(self.img_h, self.img_w)
+            transforms = CLRTransforms(self.img_h, self.img_w)
 
         if transforms is not None:
             img_transforms = []
             for aug in transforms:
+                print('aug: ', aug)
+                a_key = list(aug.keys())[-1]
+                aug = aug[a_key]
+                print('aug: ', aug)
                 p = aug['p']
                 if aug['name'] != 'OneOf':
                     img_transforms.append(

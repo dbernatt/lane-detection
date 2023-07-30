@@ -47,6 +47,7 @@ class Registry(object):
         self._module_dict[module_name] = module_class
 
     def register_module(self, cls):
+        print('register_module: ', cls)
         self._register_module(cls)
         return cls
 
@@ -62,6 +63,7 @@ def build_from_cfg(cfg, registry, default_args=None):
     Returns:
         obj: The constructed object.
     """
+    print('build_from_cfg cfg: ', cfg)
     assert isinstance(cfg, dict) and 'type' in cfg
     assert isinstance(default_args, dict) or default_args is None
     args = cfg.copy()

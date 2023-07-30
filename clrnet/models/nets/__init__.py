@@ -1,1 +1,1 @@
-from .clrnet import CLRNet, CLRNetParams
+from .clrnet import CLRNet
