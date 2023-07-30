@@ -129,7 +129,7 @@ class CLRHead(nn.Module):
         Args:
             batch_features (Tensor): Input feature maps, shape: (B, C, H, W) 
         '''
-
+        print('batch_features: ', batch_features)
         batch_size = batch_features.shape[0]
 
         prior_xs = prior_xs.view(batch_size, num_priors, -1, 1)

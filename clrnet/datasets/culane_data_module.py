@@ -39,18 +39,7 @@ from clrnet.utils import Dict2Class
 #     self.workers = workers
 
 class CULaneDataModule(pl.LightningDataModule):
-  def __init__(self, data_root, 
-                     batch_size, 
-                     img_w, 
-                     img_h,
-                     ori_img_w,
-                     ori_img_h, 
-                     cut_height,
-                     work_dirs,
-                     img_norm,
-                     num_points,
-                     max_lanes,
-                     workers,
+  def __init__(self, cfg,
                      processes,
                      *args,
                      **kwargs):
@@ -58,19 +47,7 @@ class CULaneDataModule(pl.LightningDataModule):
     print('Init CULaneDataModule...')
     self.save_hyperparameters()
 
-    self.cfg = Dict2Class(dict(data_root=data_root,
-                batch_size=batch_size,
-                img_w=img_w,
-                img_h=img_h,
-                ori_img_w=ori_img_w,
-                ori_img_h=ori_img_h,
-                cut_height=cut_height,
-                work_dirs=work_dirs,
-                img_norm=img_norm,
-                num_points=num_points,
-                max_lanes=max_lanes,
-                workers=workers
-              ))
+    self.cfg = Dict2Class(cfg)
     self.processes = processes
     print('data module cfg: ', self.cfg)
     print('data module processes: ', self.processes)

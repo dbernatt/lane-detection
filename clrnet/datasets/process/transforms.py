@@ -1,5 +1,6 @@
 import torch
 import numpy as np
+
 from ..registry import PROCESS
 
 def to_tensor(data):
