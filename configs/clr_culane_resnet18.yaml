@@ -18,23 +18,17 @@ data:
     processes:
       train:
         - GenerateLaneLine: 
-            class_path: clrnet.datasets.process.GenerateLaneLine
-            init_args:
-              tranforms: null
-              cfg: null
-              training: true
+            tranforms: null
+            cfg: null
+            training: true
         - ToTensor:
-            class_path: clrnet.datasets.transforms.ToTensor
-            init_args:
-              keys: ['img', 'lane_line', 'seg']
-              cfg: null
+            keys: ['img', 'lane_line', 'seg']
+            cfg: null
     # train_process:
 #       class_path: clrnet.datasets.process.TrainProcess
 #       init_args:
 #         processes:
 #           - GenerateLaneLine: 
-#               class_path: clrnet.datasets.process.GenerateLaneLine
-#               init_args:
 #                 tranforms: null
 #                 cfg: null
 #                 training: true

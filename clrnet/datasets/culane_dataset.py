@@ -9,8 +9,6 @@ import logging
 import pickle as pkl
 from torch.utils.data import Dataset
 
-from .registry import DATASETS
-
 LIST_FILE = {
     'train': 'list/train_gt.txt',
     'val': 'list/val.txt',
@@ -29,7 +27,6 @@ CATEGORYS = {
     'night': 'list/test_split/test8_night.txt',
 }
 
-@DATASETS.register_module
 class CULaneDataset(BaseDataset):
   def __init__(self, cfg, split, processes):
     print('Init CULaneDataset...')

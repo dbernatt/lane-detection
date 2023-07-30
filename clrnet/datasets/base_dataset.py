@@ -8,11 +8,9 @@ import torchvision
 import logging
 from clrnet.utils.visualization import imshow_lanes
 from .process import Process
-from .registry import DATASETS
 
 # from mmcv.parallel import DataContainer as DC
 
-@DATASETS.register_module
 class BaseDataset(Dataset):
     def __init__(self, cfg, split, processes):
         print('Init BaseDataset...')

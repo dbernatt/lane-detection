@@ -6,7 +6,6 @@ from pytorch_lightning.cli import LightningCLI, ArgsType
 from pytorch_lightning.demos.boring_classes import DemoModel, BoringDataModule
 
 from clrnet.models.nets import CLRNet
-from clrnet.datasets import CULaneDataModule
 from clrnet.cli import CLRNetCLI
 
 
