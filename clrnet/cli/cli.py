@@ -34,8 +34,6 @@ class CLRNetCLI(LightningCLI):
       
       # assert isinstance(data_type, (str))
 
-
-
       # if data_type == data_types['CULane']:
       #   cli = CLRNetCLI(CLRNet, CULaneDataModule, args=None, run=False)
       # else:

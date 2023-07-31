@@ -37,19 +37,21 @@ class CLRNet(pl.LightningModule):
 
     print('Init CLRNet Done.')
 
-  def forward(self, x):
-    print('forward x:', x)
+  def forward(self, batch):
+    print('forward batch:', batch)
     out = {}
-    out = self.backbone(x['img'] if isinstance(x, dict) else x)
+    out = self.backbone(batch['img'] if isinstance(batch, dict) else batch)
 
     if self.aggregator:
       out[-1] = self.aggregator(out[-1])
+
+    print('clrnet f out: ', out)
 
     if self.neck:
       out = self.neck(out)
 
     if self.training:
-      out = self.heads(out, batch=x)
+      out = self.heads(out, batch=batch)
     else:
       out = self.heads(out)
 
@@ -60,14 +62,13 @@ class CLRNet(pl.LightningModule):
     print('batch_idx: ', batch_idx)
     print('batch: ', batch)
     print('batch key list: ', list(batch.keys()))
-    # img, lane_line, seg, meta = batch
     img = batch['img']
     lane_line = batch['lane_line']
     seg = batch['seg']
     meta = batch['meta']
     print('img len: ', len(img))
     y_hat = self(batch)
-    print('training step after net')
+    print('training_step: after y_hat = self(batch)')
     loss = nn.CrossEntropyLoss(y_hat, seg)
     self.log("train_loss", loss, on_step=True, on_epoch=True, prog_bar=True, logger=True)
     return loss

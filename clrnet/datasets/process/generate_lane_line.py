@@ -31,7 +31,7 @@ class GenerateLaneLine(object):
         print('Elotte: ', transforms is None)
         if transforms is None:
             print('transforms is: ', transforms)
-            transforms = CLRTransforms(self.img_h, self.img_w)
+            # transforms = CLRTransforms(self.img_h, self.img_w)
 
         if transforms is not None:
             img_transforms = []

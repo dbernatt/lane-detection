@@ -24,12 +24,21 @@ class CLRHeadParams(object):
                num_classes,
                ignore_label,
                bg_weight,
-               lr_update_by_epoch):
+               lr_update_by_epoch,
+               iou_loss_weight,
+               cls_loss_weight,
+               xyt_loss_weight,
+               seg_loss_weight):
     self.log_interval = log_interval
     self.num_classes = num_classes
     self.ignore_label = ignore_label
     self.bg_weight = bg_weight
     self.lr_update_by_epoch = lr_update_by_epoch
+    self.iou_loss_weight = iou_loss_weight
+    self.cls_loss_weight = cls_loss_weight
+    self.xyt_loss_weight = xyt_loss_weight
+    self.seg_loss_weight = seg_loss_weight
+
 
   def __str__(self) -> str:
     return str(dict(
@@ -37,7 +46,11 @@ class CLRHeadParams(object):
       num_classes=self.num_classes, 
       ignore_label=self.ignore_label, 
       bg_weight=self.bg_weight,
-      lr_update_by_epoch=self.lr_update_by_epoch
+      lr_update_by_epoch=self.lr_update_by_epoch,
+      iou_loss_weight=self.iou_loss_weight,
+      cls_loss_weight=self.cls_loss_weight,
+      xyt_loss_weight=self.xyt_loss_weight,
+      seg_loss_weight=self.seg_loss_weight
     ))
 
 class CLRHead(nn.Module):
@@ -129,7 +142,7 @@ class CLRHead(nn.Module):
         Args:
             batch_features (Tensor): Input feature maps, shape: (B, C, H, W) 
         '''
-        print('batch_features: ', batch_features)
+        # print('batch_features.shape: ', batch_features.shape)
         batch_size = batch_features.shape[0]
 
         prior_xs = prior_xs.view(batch_size, num_priors, -1, 1)
@@ -139,6 +152,8 @@ class CLRHead(nn.Module):
         prior_xs = prior_xs * 2. - 1.
         prior_ys = prior_ys * 2. - 1.
         grid = torch.cat((prior_xs, prior_ys), dim=-1)
+        # print('batch_features.shape: ', batch_features.shape)
+        # print('grid.shape: ', grid.shape)
         feature = F.grid_sample(batch_features, grid,
                                 align_corners=True).permute(0, 2, 1, 3)
 
@@ -232,6 +247,8 @@ class CLRHead(nn.Module):
             num_priors = priors_on_featmap.shape[1]
             prior_xs = torch.flip(priors_on_featmap, dims=[2])
 
+            # print('batch_features: ', batch_features)
+            # print('batch_features len: ', len(batch_features))
             batch_prior_features = self.pool_prior_features(
                 batch_features[stage], num_priors, prior_xs)
             prior_features_stages.append(batch_prior_features)
@@ -350,13 +367,13 @@ class CLRHead(nn.Module):
              xyt_loss_weight=0.5,
              iou_loss_weight=2.,
              seg_loss_weight=1.):
-        if self.cfg.haskey('cls_loss_weight'):
+        if self.cfg.cls_loss_weight:
             cls_loss_weight = self.cfg.cls_loss_weight
-        if self.cfg.haskey('xyt_loss_weight'):
+        if self.cfg.xyt_loss_weight:
             xyt_loss_weight = self.cfg.xyt_loss_weight
-        if self.cfg.haskey('iou_loss_weight'):
+        if self.cfg.iou_loss_weight:
             iou_loss_weight = self.cfg.iou_loss_weight
-        if self.cfg.haskey('seg_loss_weight'):
+        if self.cfg.seg_loss_weight:
             seg_loss_weight = self.cfg.seg_loss_weight
 
         predictions_lists = output['predictions_lists']
