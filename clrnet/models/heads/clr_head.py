@@ -228,6 +228,7 @@ class CLRHead(nn.Module):
             prediction_list: each layer's prediction result
             seg: segmentation result for auxiliary loss
         '''
+        print("kwargs['batch']['img']: ", kwargs['batch']['img'].shape)
         batch_features = list(x[len(x) - self.refine_layers:])
         batch_features.reverse()
         batch_size = batch_features[-1].shape[0]

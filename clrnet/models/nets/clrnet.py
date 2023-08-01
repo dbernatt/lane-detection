@@ -17,6 +17,17 @@ class Decoder:
   def __init__(self):
     super().__init__()
 
+def build_optimizer(cfg, net):
+    params = []
+    cfg_cp = cfg.copy()
+    cfg_type = cfg_cp.pop('type')
+
+    if cfg_type not in dir(torch.optim):
+        raise ValueError("{} is not defined.".format(cfg_type))
+
+    _optim = getattr(torch.optim, cfg_type)
+    return _optim(net.parameters(), **cfg_cp)
+
 class CLRNet(pl.LightningModule):
 
   def __init__(self, backbone: ResNetWrapper, 
@@ -28,6 +39,7 @@ class CLRNet(pl.LightningModule):
     self.backbone = backbone
     self.save_hyperparameters(ignore=['backbone', 'neck', 'heads'])
 
+    print()
     print('neck = ', neck)   
     self.neck = neck
     
@@ -67,9 +79,14 @@ class CLRNet(pl.LightningModule):
     seg = batch['seg']
     meta = batch['meta']
     print('img len: ', len(img))
-    y_hat = self(batch)
+    output = self(batch)
+    print("output['loss']: ", output['loss'])
+    return
+    loss = output['loss'].sum()
     print('training_step: after y_hat = self(batch)')
-    loss = nn.CrossEntropyLoss(y_hat, seg)
+    print('loss: ', loss)
+    # loss = nn.CrossEntropyLoss(y_hat, seg)
+    # print('y_hat = ', y_hat)
     self.log("train_loss", loss, on_step=True, on_epoch=True, prog_bar=True, logger=True)
     return loss
 
@@ -84,4 +101,4 @@ class CLRNet(pl.LightningModule):
   #   return super().on_train_start()
 
   def configure_optimizers(self):
-    return torch.optim.Adam(self.parameters(), lr=0.6e-3)
+    return torch.optim.AdamW(self.parameters(), lr=0.6e-3)
