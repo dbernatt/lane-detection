@@ -2,6 +2,7 @@ from .transforms import ToTensor, Normalize
 from .process import Process
 
 from .generate_lane_line import GenerateLaneLine
+from .my_generate_lane_line import MyGenerateLaneLine
 
 __all__ = [
     'Process',
@@ -16,4 +17,5 @@ __all__ = [
     'Normalize',
     'ToTensor',
     'GenerateLaneLine',
+    'MyGenerateLaneLine',
 ]

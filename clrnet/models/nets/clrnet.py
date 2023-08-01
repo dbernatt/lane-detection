@@ -5,7 +5,7 @@ from torch import _cufft_get_plan_cache_size
 import torch.functional as F
 
 import torchvision.models as models
-from clrnet.models.heads import CLRHead
+from clrnet.models.heads import CLRHead, MyCLRHead
 from clrnet.models.necks import FPN
 from clrnet.models.backbones import ResNetWrapper
 
@@ -32,7 +32,7 @@ class CLRNet(pl.LightningModule):
 
   def __init__(self, backbone: ResNetWrapper, 
                      neck: FPN | None, 
-                     heads: CLRHead):
+                     heads: CLRHead | MyCLRHead):
     print('Init CLRNet...')
     super().__init__()
     # print('backbone = ', backbone)
