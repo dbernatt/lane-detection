@@ -20,6 +20,7 @@ from collections.abc import MutableMapping
 
 class CLRHeadParams(object):
   def __init__(self, 
+               sample_y,
                log_interval,
                num_classes,
                ignore_label,
@@ -29,6 +30,7 @@ class CLRHeadParams(object):
                cls_loss_weight,
                xyt_loss_weight,
                seg_loss_weight):
+    self.sample_y = sample_y
     self.log_interval = log_interval
     self.num_classes = num_classes
     self.ignore_label = ignore_label
@@ -42,6 +44,7 @@ class CLRHeadParams(object):
 
   def __str__(self) -> str:
     return str(dict(
+      sample_y=self.sample_y,
       log_interval=self.log_interval, 
       num_classes=self.num_classes, 
       ignore_label=self.ignore_label, 
@@ -121,6 +124,9 @@ class CLRHead(nn.Module):
 
         weights = torch.ones(self.cfg.num_classes)
         weights[0] = self.cfg.bg_weight
+
+        print('self.cfg.ignore_label: ', self.cfg.ignore_label)
+        print('weights: ', weights)
         self.criterion = torch.nn.NLLLoss(ignore_index=self.cfg.ignore_label,
                                      weight=weights)
 
@@ -362,8 +368,8 @@ class CLRHead(nn.Module):
         return lanes
 
     def loss(self,
-             output,
-             batch,
+             output, # {'predictions_lists': predictions_lists, 'seg': seg}
+             batch, #  kwargs['batch']
              cls_loss_weight=2.,
              xyt_loss_weight=0.5,
              iou_loss_weight=2.,
@@ -376,9 +382,13 @@ class CLRHead(nn.Module):
             iou_loss_weight = self.cfg.iou_loss_weight
         if self.cfg.seg_loss_weight:
             seg_loss_weight = self.cfg.seg_loss_weight
+        
 
         predictions_lists = output['predictions_lists']
+        print("loss predictions_lists[0].shape : ", predictions_lists[0].shape)
         targets = batch['lane_line'].clone()
+        print("loss targets.shape : ", targets.shape)
+
         cls_criterion = FocalLoss(alpha=0.25, gamma=2.)
         cls_loss = 0
         reg_xytl_loss = 0
@@ -390,7 +400,7 @@ class CLRHead(nn.Module):
             predictions_list = predictions_lists[stage]
             for predictions, target in zip(predictions_list, targets):
                 target = target[target[:, 1] == 1]
-
+                print("target.shape: ", target.shape)
                 if len(target) == 0:
                     # If there are no targets, all predictions have to be negatives (i.e., 0 confidence)
                     cls_target = predictions.new_zeros(predictions.shape[0]).long()
@@ -452,9 +462,14 @@ class CLRHead(nn.Module):
 
             cls_acc.append(sum(cls_acc_stage) / len(cls_acc_stage))
 
+        print("Before seg_loss!")
+        print("batch['seg']: ",  batch['seg'].shape)
+        print("output['seg']: ",  output['seg'].shape)
         # extra segmentation loss
         seg_loss = self.criterion(F.log_softmax(output['seg'], dim=1),
                              batch['seg'].long())
+
+        print("seg_loss: ", seg_loss)
 
         cls_loss /= (len(targets) * self.refine_layers)
         reg_xytl_loss /= (len(targets) * self.refine_layers)
@@ -463,6 +478,7 @@ class CLRHead(nn.Module):
         loss = cls_loss * cls_loss_weight + reg_xytl_loss * xyt_loss_weight \
             + seg_loss * seg_loss_weight + iou_loss * iou_loss_weight
 
+        print("loss: ", loss)
         return_value = {
             'loss': loss,
             'loss_stats': {
@@ -474,9 +490,11 @@ class CLRHead(nn.Module):
             }
         }
 
+
         for i in range(self.refine_layers):
             return_value['loss_stats']['stage_{}_acc'.format(i)] = cls_acc[i]
 
+        print("return_value: ", return_value)
         return return_value
 
 

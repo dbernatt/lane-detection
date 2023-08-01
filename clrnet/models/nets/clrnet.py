@@ -33,31 +33,32 @@ class CLRNet(pl.LightningModule):
   def __init__(self, backbone: ResNetWrapper, 
                      neck: FPN | None, 
                      heads: CLRHead):
-    
+    print('Init CLRNet...')
     super().__init__()
-    print('backbone = ', backbone)
+    # print('backbone = ', backbone)
     self.backbone = backbone
+    self.automatic_optimization = False
     self.save_hyperparameters(ignore=['backbone', 'neck', 'heads'])
 
-    print()
-    print('neck = ', neck)   
+    # print('neck = ', neck)   
     self.neck = neck
     
-    print('head = ', heads)
+    # print('head = ', heads)
     self.heads = heads
     self.aggregator = None
 
     print('Init CLRNet Done.')
 
   def forward(self, batch):
-    print('forward batch:', batch)
+    # print('CLRNet forward batch:', batch)
+    print('CLRNet forward...')
     out = {}
     out = self.backbone(batch['img'] if isinstance(batch, dict) else batch)
 
     if self.aggregator:
       out[-1] = self.aggregator(out[-1])
 
-    print('clrnet f out: ', out)
+    # print('clrnet f out: ', out)
 
     if self.neck:
       out = self.neck(out)
@@ -71,20 +72,27 @@ class CLRNet(pl.LightningModule):
 
   def training_step(self, batch, batch_idx):
     print('CLRNet training step...')
-    print('batch_idx: ', batch_idx)
-    print('batch: ', batch)
-    print('batch key list: ', list(batch.keys()))
+    # print('batch_idx: ', batch_idx)
+    # print('batch: ', batch)
+    # print('batch key list: ', list(batch.keys()))
     img = batch['img']
     lane_line = batch['lane_line']
     seg = batch['seg']
     meta = batch['meta']
+
     print('img len: ', len(img))
     output = self(batch)
     print("output['loss']: ", output['loss'])
-    return
+
+    opt = self.optimizers()
+    opt.zero_grad()
     loss = output['loss'].sum()
-    print('training_step: after y_hat = self(batch)')
-    print('loss: ', loss)
+    self.manual_backward(loss)
+    opt.step()
+    return
+    # loss = output['loss'].sum()
+    # print('training_step: after y_hat = self(batch)')
+    # print('loss: ', loss)
     # loss = nn.CrossEntropyLoss(y_hat, seg)
     # print('y_hat = ', y_hat)
     self.log("train_loss", loss, on_step=True, on_epoch=True, prog_bar=True, logger=True)

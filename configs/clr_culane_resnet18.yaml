@@ -64,6 +64,7 @@ model:
         cfg:
           class_path: clrnet.models.heads.CLRHeadParams
           init_args:
+            sample_y: [159, 154, 149, 144, 139, 134, 129, 124, 119, 114, 109, 104, 99, 94, 89, 84, 79, 74, 69]
             log_interval: 1000
             num_classes: 5
             ignore_label: 255
@@ -79,42 +80,4 @@ model:
         sample_points: 36
         
 trainer:
-  accelerator: auto
-  strategy: auto
-  devices: auto
-  num_nodes: 1
-  precision: 32-true
-  logger: null
-  callbacks: null
   fast_dev_run: true
-  max_epochs: 15
-  min_epochs: null
-  max_steps: -1
-  min_steps: null
-  max_time: null
-  limit_train_batches: null
-  limit_val_batches: null
-  limit_test_batches: null
-  limit_predict_batches: null
-  overfit_batches: 0.0
-  val_check_interval: null
-  check_val_every_n_epoch: 1
-  num_sanity_val_steps: null
-  log_every_n_steps: 8
-  enable_checkpointing: null
-  enable_progress_bar: null
-  enable_model_summary: null
-  accumulate_grad_batches: 1
-  gradient_clip_val: null
-  gradient_clip_algorithm: null
-  deterministic: null
-  benchmark: null
-  inference_mode: true
-  use_distributed_sampler: true
-  profiler: null
-  detect_anomaly: false
-  barebones: false
-  plugins: null
-  sync_batchnorm: false
-  reload_dataloaders_every_n_epochs: 0
-  default_root_dir: null

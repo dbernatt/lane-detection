@@ -4,6 +4,7 @@ import numpy as np
 
 class Lane:
     def __init__(self, points=None, invalid_value=-2., metadata=None):
+        print("Init Lane...")
         super(Lane, self).__init__()
         self.curr_iter = 0
         self.points = points
