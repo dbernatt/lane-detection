@@ -65,5 +65,4 @@ class BaseDataset(Dataset):
                 'img_name': data_info['img_name']}
         # meta = DC(meta, cpu_only=True)
         sample.update({'meta': meta})
-        # print('sample = ', sample)
         return sample

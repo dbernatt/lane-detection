@@ -110,3 +110,34 @@ class CULaneDataset(BaseDataset):
               out.append(lane_str)
 
       return '\n'.join(out)
+
+  def evaluate(self, predictions, output_basedir):
+    loss_lines = [[], [], [], []]
+    print('Generating prediction output...')
+    for idx, pred in enumerate(predictions):
+        output_dir = os.path.join(
+            output_basedir,
+            os.path.dirname(self.data_infos[idx]['img_name']))
+        output_filename = os.path.basename(
+            self.data_infos[idx]['img_name'])[:-3] + 'lines.txt'
+        os.makedirs(output_dir, exist_ok=True)
+        output = self.get_prediction_string(pred)
+
+        with open(os.path.join(output_dir, output_filename),
+                  'w') as out_file:
+            out_file.write(output)
+
+    for cate, cate_file in CATEGORYS.items():
+        result = culane_metric.eval_predictions(output_basedir,
+                                                self.data_root,
+                                                os.path.join(self.data_root, cate_file),
+                                                iou_thresholds=[0.5],
+                                                official=True)
+
+    result = culane_metric.eval_predictions(output_basedir,
+                                            self.data_root,
+                                            self.list_path,
+                                            iou_thresholds=np.linspace(0.5, 0.95, 10),
+                                            official=True)
+
+    return result[0.5]['F1']

@@ -46,10 +46,7 @@ class MyCLRHead(nn.Module):
     self.num_points = num_points
     self.refine_layers = refine_layers
 
-
     print("Init MyCLRHead done.")
-
-
 
   def forward(self, batch):
     print("MyCLRHead forward...")

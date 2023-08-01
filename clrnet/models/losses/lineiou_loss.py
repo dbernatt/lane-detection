@@ -17,7 +17,7 @@ def line_iou(pred, target, img_w, length=15, aligned=True):
     tx2 = target + length
     if aligned:
         invalid_mask = target
-        ovr = torch.min(px2, tx2) - torch.max(px1, tx1)
+        ovr = torch.min(px2, tx2) - torch.max(px1, tx1) # formula (4) clrnet 
         union = torch.max(px2, tx2) - torch.min(px1, tx1)
     else:
         num_pred = pred.shape[0]

@@ -50,7 +50,7 @@ class CULaneDataModule(pl.LightningDataModule):
       print('fit: setup...')
       self.split = 'train'
       self.culane_train_set = CULaneDataset(self.cfg, self.split, self.processes['train'])
-
+    
     # Assign test dataset for use in dataloader(s)
     if stage == "test":
       print('test: setup...')
@@ -66,7 +66,7 @@ class CULaneDataModule(pl.LightningDataModule):
   def train_dataloader(self):
     print('Create train dataloader...')
     # init_fn = partial(self.worker_init_fn, seed=self.cfg['seed'])
-    data_loader =  DataLoader(
+    data_loader = DataLoader(
           self.culane_train_set,
           batch_size=self.cfg.batch_size,
           shuffle=True,
@@ -76,6 +76,20 @@ class CULaneDataModule(pl.LightningDataModule):
           # collate_fn=partial(collate, samples_per_gpu=samples_per_gpu),
           # worker_init_fn=init_fn
           )
+    item = next(iter(data_loader))
+    # print('img shape: ', item['img'].shape) # torch.Size([24, 3, 160, 400])
+    # print('seg shape: ', item['seg'].shape) # torch.Size([24, 160, 400]) (bg=0, fg=1)
+    # print('lane_line shape: ', item['lane_line'].shape) # torch.Size([24, 4, 78])
+    # print('meta shape: ', item['meta']) # torch.Size([24, 4, 78])
+    """
+      item = {
+        'img': torch.Size([24, 3, 160, 400])
+        'seg': torch.Size([24, 160, 400])
+        'lane_line': torch.Size([24, 4, 78])
+        'meta': { 'full_img_path': [img1path, img2path, ... img(24 -1)path]}
+      }
+    """
+    # self.culane_train_set.view(item[])
     print('data_loader len:', len(data_loader))
     return data_loader
 

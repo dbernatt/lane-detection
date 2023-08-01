@@ -55,7 +55,7 @@ def imshow_lanes(img, lanes, show=False, out_file=None, width=4):
 
 
     if show:
-        cv2.imshow('view', img)
+        cv2.imshow(img)
         cv2.waitKey(0)
 
     if out_file:
