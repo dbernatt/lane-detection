@@ -1,6 +1,8 @@
 
 import torch
 import torch.nn as nn
+import os.path as osp
+
 
 class MyCLRHeadParams(object):
   def __init__(self, 
@@ -48,10 +50,24 @@ class MyCLRHead(nn.Module):
 
     print("Init MyCLRHead done.")
 
-  def forward(self, batch):
+  def lane_prior(self):
+    pass
+
+  def forward(self, x, **kwargs):
+    # x - ([],[],[]) features from fpn
     print("MyCLRHead forward...")
+    print("MyCLRHead forward len(x): ", len(x))
+    print("MyCLRHead forward x[0].shape: ", x[0].shape)
+    print("MyCLRHead forward x[1].shape: ", x[1].shape)
+    print("MyCLRHead forward x[2].shape: ", x[2].shape)
+    # print("MyCLRHead forward **kwargs: ", kwargs['batch'].keys())
+    batch =  kwargs['batch'] #  dict_keys(['img', 'lane_line', 'seg', 'meta'])
+    out = {}
+
+    # for i in range(self.refine_layers):
+      
     
-    return batch 
+    return out 
 
 
 

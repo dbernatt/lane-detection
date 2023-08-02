@@ -20,7 +20,7 @@ class FPN(nn.Module):
                  norm_cfg=None,
                  attention=False,
                  act_cfg=None,
-                 upsample_cfg=dict(mode='nearest'),
+                 upsample_cfg=dict(mode='nearest', scale_factor=2),
                  init_cfg=dict(type='Xavier',
                                layer='Conv2d',
                                distribution='uniform'),
@@ -125,6 +125,7 @@ class FPN(nn.Module):
             # In some cases, fixing `scale factor` (e.g. 2) is preferred, but
             #  it cannot co-exist with `size` in `F.interpolate`.
             if 'scale_factor' in self.upsample_cfg:
+                print("FPN forward upsample_cfg: ", self.upsample_cfg)
                 laterals[i - 1] += F.interpolate(laterals[i],
                                                  **self.upsample_cfg)
             else:
@@ -140,6 +141,7 @@ class FPN(nn.Module):
         ]
         # part 2: add extra levels
         if self.num_outs > len(outs):
+            print("add extra levels...")
             # use max pool to get more levels on top of outputs
             # (e.g., Faster R-CNN, Mask R-CNN)
             if not self.add_extra_convs:

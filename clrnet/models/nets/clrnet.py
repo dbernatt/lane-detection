@@ -9,6 +9,11 @@ from clrnet.models.heads import CLRHead, MyCLRHead
 from clrnet.models.necks import FPN
 from clrnet.models.backbones import ResNetWrapper
 
+import os.path as osp
+import matplotlib.pyplot as plt
+import numpy as np
+from PIL import Image
+
 class Encoder:
   def __init__(self):
     super().__init__()
@@ -38,20 +43,36 @@ class CLRNet(pl.LightningModule):
 
     print('Init CLRNet Done.')
 
+  def view(self, img, img_full_path):
+    print("view...")
+    print("view img.shape: ", img.shape)
+    plt.imshow(img.permute(1, 2, 0)) # [H, W, C]
+    plt.show()
+
   def forward(self, batch):
     # print('CLRNet forward batch:', batch)
     print('CLRNet forward...')
+    print("CLRNet batch.keys: ", batch.keys()) # dict_keys(['img', 'lane_line', 'seg', 'meta'])
+    print("CLRNet batch.meta: ", batch['meta']) # {'full_img_path': ['data/CULane/driver_23_30frame/05161223_0545.MP4/04545.jpg', 'img2', ...]}
     out = {}
     out = self.backbone(batch['img'] if isinstance(batch, dict) else batch)
 
     if self.aggregator:
       out[-1] = self.aggregator(out[-1])
 
-    # print('clrnet f out: ', out)
-
     if self.neck:
       out = self.neck(out)
 
+    img_idx = 0
+    img = batch['img'][img_idx]
+    img_full_path = batch['meta']['full_img_path'][img_idx]
+
+    self.view(img, img_full_path)
+    print("after view ")
+    exit(0)
+
+    # print('clrnet forward neck out: ', out)
+    print('clrnet forward batch: ', batch.keys())
     if self.training:
       out = self.heads(out, batch=batch)
     else:

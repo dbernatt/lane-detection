@@ -8,6 +8,7 @@ import torchvision
 import logging
 from clrnet.utils.visualization import imshow_lanes
 from .process import Process
+import matplotlib as plt
 
 # from mmcv.parallel import DataContainer as DC
 
