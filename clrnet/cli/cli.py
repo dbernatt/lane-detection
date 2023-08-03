@@ -5,11 +5,14 @@ from typing import Dict
 
 from clrnet.models.nets import CLRNet
 from clrnet.datasets import CULaneDataModule
+from pytorch_lightning.loggers import TensorBoardLogger
+
 
 
 
 class CLRNetCLI(LightningCLI):
-    # def __init__(self, model_class, datamodule_class):
+    # def __init__(self, *args, **kwargs):
+    #   super(CLRNetCLI, self).__init__(*args, **kwargs)
     #   print('Init CLRNetCLI...')
     #   # print('kwargs = ', **kwargs)
       
@@ -17,6 +20,10 @@ class CLRNetCLI(LightningCLI):
     #                     datamodule_class=datamodule_class,
     #                     run=False)
 
+    # def add_arguments_to_parser(self, parser):
+    #   parser.link_arguments('trainer', 'model.init_args.trainer')
+      # parser.set_defaults({"trainer.logger": lazy_instance(TensorBoardLogger, save_dir="/logs")})
+      
     def before_instantiate_classes(self):
       print(self.config)
       print('Before init')
@@ -55,6 +62,7 @@ class CLRNetCLI(LightningCLI):
     def add_arguments_to_parser(self, parser):
       print('parser = ', parser)
       # parser.add_optimizer_args(torch.optim.Adam)
+      # parser.link_arguments('trainer', 'model.init_args.trainer')
       parser.link_arguments("data.init_args.cfg.init_args.img_w", "model.init_args.heads.init_args.img_w")
       parser.link_arguments("data.init_args.cfg.init_args.img_h", "model.init_args.heads.init_args.img_h")
       # parser.link_arguments("data.init_args.cfg.init_args.num_classes", "model.init_args.heads.init_args.num_classes")

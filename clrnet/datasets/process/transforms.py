@@ -6,6 +6,8 @@ import numbers
 import collections
 from PIL import Image
 
+from clrnet.utils import show_img
+
 from ..registry import PROCESS
 
 
@@ -19,7 +21,7 @@ def to_tensor(data):
         data (torch.Tensor | numpy.ndarray | Sequence | int | float): Data to
             be converted.
     """
-
+    print('to_tensor: data type: ', type(data))
     if isinstance(data, torch.Tensor):
         return data
     elif isinstance(data, np.ndarray):
@@ -34,29 +36,37 @@ def to_tensor(data):
 
 @PROCESS.register_module
 class ToTensor(object):
-    """Convert some results to :obj:`torch.Tensor` by given keys.
+  """Convert some results to :obj:`torch.Tensor` by given keys.
 
-    Args:
-        keys (Sequence[str]): Keys that need to be converted to Tensor.
-    """
-    def __init__(self, keys=['img', 'mask'], cfg=None):
-        print('ToTensor')
-        self.keys = keys
+  Args:
+      keys (Sequence[str]): Keys that need to be converted to Tensor.
+  """
+  def __init__(self, keys=['img', 'mask'], cfg=None):
+    print('Init ToTensor')
+    self.keys = keys
 
-    def __call__(self, sample):
-        data = {}
-        if len(sample['img'].shape) < 3:
-            sample['img'] = np.expand_dims(img, -1)
-        for key in self.keys:
-            if key == 'img_metas' or key == 'gt_masks' or key == 'lane_line':
-                data[key] = sample[key]
-                continue
-            data[key] = to_tensor(sample[key])
-        data['img'] = data['img'].permute(2, 0, 1)
-        return data
+  def __call__(self, sample):
+    print("ToTensor call sample: ")
+    data = {}
+    if len(sample['img'].shape) < 3:
+      sample['img'] = np.expand_dims(img, -1)
+    for key in self.keys:
+      if key == 'img_metas' or key == 'gt_masks' or key == 'lane_line':
+        data[key] = sample[key]
+        continue
+      data[key] = to_tensor(sample[key])
+    
+    print("type data['img']: ", type(data['img']))
+    print("before data['img'].shape: ", data['img'].shape)
+    data['img'] = data['img'].permute(2, 0, 1)
 
-    def __repr__(self):
-        return self.__class__.__name__ + f'(keys={self.keys})'
+    # show_img(data['img'], sample['img_path'])
+    
+    print("after data['img'].shape: ", data['img'].shape)
+    return data
+
+  def __repr__(self):
+    return self.__class__.__name__ + f'(keys={self.keys})'
 
 
 @PROCESS.register_module

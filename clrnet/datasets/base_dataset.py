@@ -6,9 +6,11 @@ import torch
 from torch.utils.data import Dataset
 import torchvision
 import logging
-from clrnet.utils.visualization import imshow_lanes
+from clrnet.utils.visualization import imshow_lanes, show_img, display_image_in_actual_size
 from .process import Process
 import matplotlib as plt
+
+
 
 # from mmcv.parallel import DataContainer as DC
 
@@ -38,9 +40,19 @@ class BaseDataset(Dataset):
         return len(self.data_infos)
 
     def __getitem__(self, idx):
+        print("BASE DATASET getitem: ", idx)
         data_info = self.data_infos[idx]
-        img = cv2.imread(data_info['img_path'])
-        img = img[self.cfg.cut_height:, :, :]
+        # print("get item, img_path: ", (data_info['img_path']))
+        img = cv2.imread(data_info['img_path'], cv2.IMREAD_COLOR)
+        img = cv2.
+        img2 = torch.from_numpy(img)
+        print("img2.shape: ", img2.shape)
+        show_img(img2.permute(2, 0, 1), data_info['img_path'])
+        # img = torch.from_numpy(img)
+
+        # display_image_in_actual_size(img, data_info['img_path'])
+        
+        # img = img[self.cfg.cut_height:, :, :]
         sample = data_info.copy()
         sample.update({'img': img})
 
