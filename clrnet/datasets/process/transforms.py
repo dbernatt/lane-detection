@@ -21,7 +21,7 @@ def to_tensor(data):
         data (torch.Tensor | numpy.ndarray | Sequence | int | float): Data to
             be converted.
     """
-    print('to_tensor: data type: ', type(data))
+    # print('to_tensor: data type: ', type(data))
     if isinstance(data, torch.Tensor):
         return data
     elif isinstance(data, np.ndarray):
@@ -46,7 +46,7 @@ class ToTensor(object):
     self.keys = keys
 
   def __call__(self, sample):
-    print("ToTensor call sample: ")
+    # print("ToTensor call sample: ")
     data = {}
     if len(sample['img'].shape) < 3:
       sample['img'] = np.expand_dims(img, -1)
@@ -56,13 +56,13 @@ class ToTensor(object):
         continue
       data[key] = to_tensor(sample[key])
     
-    print("type data['img']: ", type(data['img']))
-    print("before data['img'].shape: ", data['img'].shape)
+    # print("type data['img']: ", type(data['img']))
+    # print("before data['img'].shape: ", data['img'].shape)
     data['img'] = data['img'].permute(2, 0, 1)
 
     # show_img(data['img'], sample['img_path'])
     
-    print("after data['img'].shape: ", data['img'].shape)
+    # print("after data['img'].shape: ", data['img'].shape)
     return data
 
   def __repr__(self):

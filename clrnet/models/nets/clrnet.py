@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from PIL import Image
 from sys import exit
-from clrnet.utils.visualization import display_image_in_actual_size
+from clrnet.utils.visualization import display_image_in_actual_size, show_img
 from pytorch_lightning.loggers import TensorBoardLogger
 
 class Encoder:
@@ -135,6 +135,7 @@ class CLRNet(pl.LightningModule):
     print("self.logger.experiment = ", self.logger.experiment)
     # print("batch['img'].shape: ", batch['img'].shape)
 
+    show_img(img, batch['meta']['full_img_path'][0])
     tensorboard.add_image(img_name, img, self.current_epoch)
     # self.log_tb_images(img, img_name)
     # print('forward self logger: ', self.logger)
