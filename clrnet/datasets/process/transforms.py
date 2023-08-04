@@ -54,14 +54,18 @@ class ToTensor(object):
       if key == 'img_metas' or key == 'gt_masks' or key == 'lane_line':
         data[key] = sample[key]
         continue
+      # print('totensor sample img min max: ', sample['img'].min(), sample['img'].max())
+
       data[key] = to_tensor(sample[key])
+      # print('totensor img min max: ', data['img'].min(), data['img'].max())
     
     # print("type data['img']: ", type(data['img']))
     # print("before data['img'].shape: ", data['img'].shape)
-    data['img'] = data['img'].permute(2, 0, 1)
-
-    # show_img(data['img'], sample['img_path'])
     
+
+    data['img'] = data['img'].permute(2, 0, 1) # [C, H, W]
+    # print('totensor premute img min max: ', data['img'].min(), data['img'].max())
+
     # print("after data['img'].shape: ", data['img'].shape)
     return data
 
@@ -304,6 +308,7 @@ class Normalize(object):
         else:
             img = img - np.array(m)[np.newaxis, np.newaxis, ...]
             img = img / np.array(s)[np.newaxis, np.newaxis, ...]
+
         sample['img'] = img
 
         return sample
@@ -311,17 +316,17 @@ class Normalize(object):
 
 def CLRTransforms(img_h, img_w):
     return [
-        dict(name='Resize',
-             parameters=dict(size=dict(height=img_h, width=img_w)),
-             p=1.0),
-        dict(name='HorizontalFlip', parameters=dict(p=1.0), p=0.5),
-        dict(name='Affine',
-             parameters=dict(translate_percent=dict(x=(-0.1, 0.1),
-                                                    y=(-0.1, 0.1)),
-                             rotate=(-10, 10),
-                             scale=(0.8, 1.2)),
-             p=0.7),
-        dict(name='Resize',
-             parameters=dict(size=dict(height=img_h, width=img_w)),
-             p=1.0),
+        # dict(name='Resize',
+        #      parameters=dict(size=dict(height=img_h, width=img_w)),
+        #      p=1.0),
+        # dict(name='HorizontalFlip', parameters=dict(p=1.0), p=0.5),
+        # dict(name='Affine',
+        #      parameters=dict(translate_percent=dict(x=(-0.1, 0.1),
+        #                                             y=(-0.1, 0.1)),
+        #                      rotate=(-10, 10),
+        #                      scale=(0.8, 1.2)),
+        #      p=0.7),
+        # dict(name='Resize',
+        #      parameters=dict(size=dict(height=img_h, width=img_w)),
+        #      p=1.0),
     ]

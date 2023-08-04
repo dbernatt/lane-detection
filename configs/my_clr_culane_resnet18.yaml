@@ -11,8 +11,10 @@ data:
       cut_height: 73
       work_dirs: 'work_dirs/clr/r18_culane'
       img_norm: 
-        mean: [103.939, 116.779, 123.68]
-        std: [1., 1., 1.]
+        #mean: [103.939, 116.779, 123.68]
+        mean: [0.485, 0.456, 0.406]
+        #std: [1., 1., 1.]
+        std: [0.229, 0.224, 0.225]
       num_points: 72
       max_lanes: 4
       workers: 2
@@ -22,10 +24,10 @@ data:
             type: 'MyGenerateLaneLine'
             cfg: ${data.init_args.cfg}
             training: true
-            transforms: null    
-        - normalize:
-            type: 'Normalize'
-            img_norm: ${data.init_args.cfg.img_norm}
+            transforms: null 
+        #- normalize:
+        #    type: 'Normalize'
+        #    img_norm: ${data.init_args.cfg.img_norm}
         - toTensor: 
             type: 'ToTensor'
             keys: ['img', 'lane_line', 'seg']

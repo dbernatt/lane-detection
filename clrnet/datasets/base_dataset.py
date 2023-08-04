@@ -72,8 +72,9 @@ class BaseDataset(Dataset):
                         lanes.append((p[0], p[1] - self.cfg.cut_height))
                     new_lanes.append(lanes)
                 sample.update({'lanes': new_lanes})
-
+        
         sample = self.processes(sample)
+        # print("base img min max: ", sample['img'].min(), sample['img'].max())
         meta = {'full_img_path': data_info['img_path'],
                 'img_name': data_info['img_name']}
         # meta = DC(meta, cpu_only=True)

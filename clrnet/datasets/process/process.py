@@ -17,7 +17,7 @@ class Process(object):
     for process in processes:
         if isinstance(process, dict):
             print('process: ', process)
-            p_key = list(process.keys())[-1]
+            p_key = list(process.keys())[-1] # extract process from process list
             process = build_from_cfg(process[p_key],
                                       PROCESS,
                                       default_args=None)
@@ -31,9 +31,9 @@ class Process(object):
   def __call__(self, data):
     """Call function to apply processes sequentially.
     Args:
-        data (dict): Contains data(init_args) dict to the process.
+      data (dict): Contains data(init_args) dict to the process.
     Returns:
-        dict: Processed data.
+      dict: Processed data.
     """
 
     for t in self.processes:

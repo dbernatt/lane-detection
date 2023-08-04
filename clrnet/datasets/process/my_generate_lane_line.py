@@ -32,7 +32,7 @@ class MyGenerateLaneLine(object):
     print('Elotte: ', transforms is None)
     if transforms is None:
       print('transforms is: ', transforms)
-      # transforms = CLRTransforms(self.img_h, self.img_w)
+      transforms = CLRTransforms(self.img_h, self.img_w)
 
     if transforms is not None:
       img_transforms = []
@@ -285,6 +285,7 @@ class MyGenerateLaneLine(object):
                 exit()
     
     sample['img'] = img.astype(np.float32) / 255.
+    # print("generate lane line: ", sample['img'].min(), sample['img'].max())
     sample['lane_line'] = label
     sample['lanes_endpoints'] = lane_endpoints
     sample['gt_points'] = new_anno['lanes']
