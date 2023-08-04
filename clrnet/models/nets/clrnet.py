@@ -113,6 +113,8 @@ class CLRNet(pl.LightningModule):
     # first_image_features_normalized = (first_image_features - first_image_features.min()) / (first_image_features.max() - first_image_features.min())
     # first_image_features_normalized = (first_image_features - first_image_features.min()) / (first_image_features.max() - first_image_features.min())
 
+    print(first_image_features.min())
+    print(first_image_features.max())
     # img_tensor = out[0][0].unsqueeze(0).to(torch.uint8)  # Add a batch dimension, shape: (1, 64, 22, 100)
     # print("img_tensor.shape: ", first_image_features.shape)
     # grid_image = tv.utils.make_grid(first_image_features.unsqueeze(1), nrow=8, normalize=True)
