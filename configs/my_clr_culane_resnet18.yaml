@@ -23,8 +23,9 @@ data:
             cfg: ${data.init_args.cfg}
             training: true
             transforms: null    
-        #- Normalize:
-        #  img_norm: ${data.init_args.cfg.img_norm}
+        - normalize:
+            type: 'Normalize'
+            img_norm: ${data.init_args.cfg.img_norm}
         - toTensor: 
             type: 'ToTensor'
             keys: ['img', 'lane_line', 'seg']

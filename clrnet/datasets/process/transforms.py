@@ -290,6 +290,7 @@ class RandomHorizontalFlip(object):
 @PROCESS.register_module
 class Normalize(object):
     def __init__(self, img_norm, cfg=None):
+        print("Normalize init...")
         self.mean = np.array(img_norm['mean'], dtype=np.float32)
         self.std = np.array(img_norm['std'], dtype=np.float32)
 
