@@ -101,10 +101,10 @@ class CLRNet(pl.LightningModule):
     layer3_activations = out[2]  # Get activations from layer 3
     layer4_activations = out[3]  # Get activations from layer 4
 
-    img_fea_1 = layer1_activations[0]  # Get the features of the img_idx image in the batch
-    img_fea_2 = layer2_activations[0]  # Get the features of the img_idx image in the batch
-    img_fea_3 = layer3_activations[0]  # Get the features of the img_idx image in the batch
-    img_fea_4 = layer4_activations[0]  # Get the features of the img_idx image in the batch
+    img_fea_1 = layer1_activations[0][0]  # Get the features of the img_idx image in the batch
+    img_fea_2 = layer2_activations[0][0]  # Get the features of the img_idx image in the batch
+    img_fea_3 = layer3_activations[0][0]  # Get the features of the img_idx image in the batch
+    img_fea_4 = layer4_activations[0][0]  # Get the features of the img_idx image in the batch
 
     grid_image_1 = tv.utils.make_grid(img_fea_1.unsqueeze(1), nrow=int(img_fea_1.shape[0]/8), norm=True)
     grid_image_2 = tv.utils.make_grid(img_fea_2.unsqueeze(1), nrow=int(img_fea_2.shape[0]/8), norm=True)
