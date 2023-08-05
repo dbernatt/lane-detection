@@ -88,6 +88,19 @@ def show_img(img: Tensor, img_path: str):
 
   plt.show()
 
+def tb_img_with_lanes_(img, lanes, out_file=None, width=4):
+  lanes_xys = []
+  for _, lane in enumerate(lanes):
+    xys = []
+    for x, y in lane:
+      if x <= 0 or y <= 0:
+        continue
+      x, y = int(x), int(y)
+      xys.append((x, y))
+    lanes_xys.append(xys)
+  lanes_xys.sort(key=lambda xys : xys[0][0])
+
+
 def imshow_lanes(img, lanes, show=False, out_file=None, width=4):
     lanes_xys = []
     for _, lane in enumerate(lanes):
