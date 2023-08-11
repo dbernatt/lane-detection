@@ -5,7 +5,7 @@ import torch.functional as F
 
 import torchvision.models as models
 import torchvision as tv
-from clrnet.models.heads import CLRHead, MyCLRHead
+from clrnet.models.heads import MyCLRHead
 from clrnet.models.necks import FPN
 from clrnet.models.backbones import ResNetWrapper
 
@@ -21,7 +21,7 @@ class Detector(nn.Module):
     def __init__(self,
                      backbone: ResNetWrapper, 
                      neck: FPN | None, 
-                     heads: CLRHead | MyCLRHead):
+                     heads: MyCLRHead):
         print("Init Detector...")
         super(Detector, self).__init__()
         self.backbone = backbone

@@ -3,8 +3,6 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from mmcv.cnn import ConvModule
-
 class FPN(nn.Module):
     def __init__(self,
                  in_channels,
@@ -66,22 +64,14 @@ class FPN(nn.Module):
         self.fpn_convs = nn.ModuleList()
 
         for i in range(self.start_level, self.backbone_end_level):
-            l_conv = ConvModule(
+            l_conv = nn.Conv2d(
                 in_channels[i],
                 out_channels,
-                1,
-                conv_cfg=conv_cfg,
-                norm_cfg=norm_cfg if not self.no_norm_on_lateral else None,
-                act_cfg=act_cfg,
-                inplace=False)
-            fpn_conv = ConvModule(out_channels,
+                kernel_size=1)
+            fpn_conv = nn.Conv2d(out_channels,
                                   out_channels,
-                                  3,
-                                  padding=1,
-                                  conv_cfg=conv_cfg,
-                                  norm_cfg=norm_cfg,
-                                  act_cfg=act_cfg,
-                                  inplace=False)
+                                  kernel_size=3,
+                                  padding=1)
 
             self.lateral_convs.append(l_conv)
             self.fpn_convs.append(fpn_conv)
@@ -94,15 +84,11 @@ class FPN(nn.Module):
                     in_channels = self.in_channels[self.backbone_end_level - 1]
                 else:
                     in_channels = out_channels
-                extra_fpn_conv = ConvModule(in_channels,
+                extra_fpn_conv = nn.Conv2d(in_channels,
                                             out_channels,
-                                            3,
+                                            kernel_size=3,
                                             stride=2,
-                                            padding=1,
-                                            conv_cfg=conv_cfg,
-                                            norm_cfg=norm_cfg,
-                                            act_cfg=act_cfg,
-                                            inplace=False)
+                                            padding=1)
                 self.fpn_convs.append(extra_fpn_conv)
 
     def forward(self, inputs):

@@ -4,12 +4,13 @@ import torch.nn as nn
 import os.path as osp
 import math
 import torch.nn.functional as F
+from torchvision.ops import nms
 
 from clrnet.models.utils.seg_decoder import SegDecoder
 from clrnet.models.utils.roi_gather import ROIGather
 from clrnet.models.losses.focal_loss import FocalLoss, SoftmaxFocalLoss
 from clrnet.models.losses.accuracy import accuracy
-from clrnet.ops import nms
+# from clrnet.ops import nms
 from clrnet.models.utils.dynamic_assign import assign
 from clrnet.models.losses.lineiou_loss import liou_loss
 from clrnet.utils.lane import Lane
@@ -566,8 +567,8 @@ class MyCLRHead(nn.Module):
           keep, num_to_keep, _ = nms(
               nms_predictions,
               scores,
-              overlap=self.cfg.test_parameters['nms_thres'],
-              top_k=self.cfg.max_lanes)
+              iou_threshold=self.cfg.test_parameters['nms_thres'])
+              # top_k=self.cfg.max_lanes)
           keep = keep[:num_to_keep]
           predictions = predictions[keep]
 

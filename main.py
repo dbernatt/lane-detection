@@ -3,6 +3,8 @@ import yaml
 import errno
 import pytorch_lightning as pl
 from pytorch_lightning.cli import ArgsType
+import torch
+import torchvision
 # from pytorch_lightning.demos.boring_classes import DemoModel, BoringDataModule
 
 from clrnet.cli import CLRNetCLI
@@ -23,4 +25,8 @@ def main(args: ArgsType = None):
                   )
 
 if __name__ == '__main__':
+  print(torch.__version__)
+  # print(torch.__file__)
+  # print(torch.version.cuda)
+  print(torchvision.__version__)
   main()

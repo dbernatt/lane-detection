@@ -1,8 +1,6 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from mmcv.cnn import ConvModule
-
 
 def LinearModule(hidden_dim):
     return nn.ModuleList(
@@ -40,12 +38,11 @@ class ROIGather(nn.Module):
         super(ROIGather, self).__init__()
         self.in_channels = in_channels
         self.num_priors = num_priors
-        self.f_key = ConvModule(in_channels=self.in_channels,
+        self.f_key = nn.Conv2d(in_channels=self.in_channels,
                                 out_channels=self.in_channels,
                                 kernel_size=1,
                                 stride=1,
-                                padding=0,
-                                norm_cfg=dict(type='BN'))
+                                padding=0)
 
         self.f_query = nn.Sequential(
             nn.Conv1d(in_channels=num_priors,
@@ -76,18 +73,19 @@ class ROIGather(nn.Module):
         self.catconv = nn.ModuleList()
         for i in range(refine_layers):
             self.convs.append(
-                ConvModule(in_channels,
+                nn.Conv2d(in_channels,
                            mid_channels, (9, 1),
                            padding=(4, 0),
-                           bias=False,
-                           norm_cfg=dict(type='BN')))
+                           bias=False)
+            )
 
             self.catconv.append(
-                ConvModule(mid_channels * (i + 1),
+                nn.Conv2d(mid_channels * (i + 1),
                            in_channels, (9, 1),
                            padding=(4, 0),
                            bias=False,
-                           norm_cfg=dict(type='BN')))
+                          )
+            )
 
         self.fc = nn.Linear(sample_points * fc_hidden_dim, fc_hidden_dim)
 
