@@ -14,14 +14,13 @@ from ..registry import PROCESS
 class MyGenerateLaneLine(object):
   def __init__(self, transforms=None, cfg=None, training=True):
     print('Init Generate Lane Line')
-    print('object: ', object)
     print('transforms: ', transforms)
     print('cfg: ', cfg)
     self.transforms = transforms
     self.img_w, self.img_h = cfg['img_w'], cfg['img_h']
-    self.num_points = cfg['num_points']
-    self.n_offsets = cfg['num_points']
-    self.n_strips = cfg['num_points'] - 1
+    self.n_points = cfg['n_points']
+    self.n_offsets = cfg['n_points']
+    self.n_strips = cfg['n_points'] - 1
     self.strip_size = self.img_h / self.n_strips # 160 / (72 - 1) = 2.25 = 2
     self.max_lanes = cfg['max_lanes'] # 4
     self.offsets_ys = np.arange(self.img_h, -1, -self.strip_size) # [160, 158, 156, 154, ..., 2, 0]

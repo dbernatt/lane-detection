@@ -2,15 +2,14 @@ import argparse
 import yaml
 import errno
 import pytorch_lightning as pl
-from pytorch_lightning.loggers import TensorBoardLogger
-from pytorch_lightning.cli import LightningCLI, ArgsType
+from pytorch_lightning.cli import ArgsType
 # from pytorch_lightning.demos.boring_classes import DemoModel, BoringDataModule
 
-from clrnet.models.nets import CLRNet
 from clrnet.cli import CLRNetCLI
+from clrnet.engine import Runner
   
 def main(args: ArgsType = None):
-  cli = CLRNetCLI(CLRNet, 
+  cli = CLRNetCLI(Runner, 
                     run=True,
                     # args=args,
                     # trainer_class=TensorBoardLogger,

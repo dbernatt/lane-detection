@@ -15,7 +15,7 @@ data:
         mean: [0.485, 0.456, 0.406]
         #std: [1., 1., 1.]
         std: [0.229, 0.224, 0.225]
-      num_points: 72
+      n_points: 72
       max_lanes: 4
       workers: 2
     processes:
@@ -34,7 +34,7 @@ data:
             cfg: ${data.init_args.cfg}
 
 model:
-  class_path: CLRNet
+  class_path: Runner
   init_args:
     backbone:
       class_path: clrnet.models.backbones.ResNetWrapper
@@ -69,7 +69,7 @@ model:
           init_args:
             sample_y: [159, 154, 149, 144, 139, 134, 129, 124, 119, 114, 109, 104, 99, 94, 89, 84, 79, 74, 69]
             log_interval: 1000
-            num_classes: 5
+            n_classes: 4
             ignore_label: 255
             bg_weight: 0.4
             lr_update_by_epoch: false
@@ -77,10 +77,11 @@ model:
             cls_loss_weight: 2.0
             xyt_loss_weight: 0.2
             seg_loss_weight: 1.0
-        num_priors: 192
-        refine_layers: 3
-        fc_hidden_dim: 64
-        sample_points: 36
+            n_priors: 192
+            prior_fea_channels: 64
+            refine_layers: 3
+            fc_hidden_dim: 64
+            sample_points: 36
         
 trainer:
   logger: 

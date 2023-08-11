@@ -49,28 +49,6 @@ class CLRNet(pl.LightningModule):
     self.aggregator = None
 
     print('Init CLRNet Done.')
-
-  def makegrid(self, output, numrows):
-    outer=(torch.Tensor.cpu(output).detach()) # move from gpu to cpu
-    # outer = outer[None, :, :] # Tenso.shape [1, h, w]
-    # print("outer: ", outer)
-    print("outer shape: ", outer.shape)
-    plt.figure(figsize=(20,5))
-    b=np.array([]).reshape(0,outer.shape[2])
-    c=np.array([]).reshape(numrows*outer.shape[2],0)
-    i=0
-    j=0
-    while(i < outer.shape[1]):
-      img=outer[0]
-      b=np.concatenate((img,b),axis=0)
-      j+=1
-      if(j==numrows):
-        c=np.concatenate((c,b),axis=1)
-        b=np.array([]).reshape(0,outer.shape[2])
-        j=0
-            
-      i+=1
-    return c
   
   def showActivations(self, batch_idx, batch, img_idx = 0, num_fea_imgs = 1):
     print('showActivations batch.keys: ', batch.keys())
@@ -301,8 +279,8 @@ class CLRNet(pl.LightningModule):
     meta = batch['meta'] # {'full_img_path': [...]}
 
     # print('img len: ', len(imgs)) # 24
-    self.showActivations(batch_idx, batch)
-    # output = self(batch)
+    # self.showActivations(batch_idx, batch)
+    output = self(batch)
     # return 0.2
     # print("output['loss']: ", output['loss'])
 
