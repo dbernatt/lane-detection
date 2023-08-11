@@ -8,6 +8,7 @@ from tqdm import tqdm
 import logging
 import pickle as pkl
 from torch.utils.data import Dataset
+from clrnet.utils import culane_metric
 
 LIST_FILE = {
     'train': 'list/train_gt.txt',
@@ -31,6 +32,7 @@ class CULaneDataset(BaseDataset):
   def __init__(self, cfg, split, processes):
     print('Init CULaneDataset...')
     super().__init__(cfg, split, processes)
+    print('split: ', split)
     self.list_path = osp.join(self.cfg.data_root, LIST_FILE[split])
     self.data_root = cfg.data_root
     self.split = split

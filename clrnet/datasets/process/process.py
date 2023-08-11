@@ -13,12 +13,14 @@ class Process(object):
     print('Init Process...')
     assert isinstance(processes, collections.abc.Sequence)
     print('processes in: ', processes)
+    print('processes in len: ', len(processes))
     self.processes = []
     for process in processes:
         if isinstance(process, dict):
             print('process: ', process)
-            p_key = list(process.keys())[-1] # extract process from process list
-            process = build_from_cfg(process[p_key],
+            assert len(list(process.keys())) == 1
+            key = list(process.keys())[0]
+            process = build_from_cfg(process[key],
                                       PROCESS,
                                       default_args=None)
             self.processes.append(process)

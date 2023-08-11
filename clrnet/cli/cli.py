@@ -65,6 +65,7 @@ class CLRNetCLI(LightningCLI):
       # parser.link_arguments('trainer', 'model.init_args.trainer')
       parser.link_arguments("data.init_args.cfg.init_args.img_w", "model.init_args.heads.init_args.img_w")
       parser.link_arguments("data.init_args.cfg.init_args.img_h", "model.init_args.heads.init_args.img_h")
+      parser.link_arguments("data.init_args.cfg.init_args.max_lanes", "model.init_args.heads.init_args.max_lanes")
       # parser.link_arguments("data.init_args.cfg.init_args.num_classes", "model.init_args.heads.init_args.num_classes")
       # parser.link_arguments("data.init_args.cfg.init_args.batch_size", "model.init_args.batch_size")
       # parser.link_arguments("data.init_args.cfg", "model.init_args.cfg")

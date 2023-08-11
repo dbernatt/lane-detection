@@ -10,8 +10,6 @@ from clrnet.utils.visualization import imshow_lanes, show_img, display_image_in_
 from .process import Process
 import matplotlib as plt
 
-
-
 # from mmcv.parallel import DataContainer as DC
 
 class BaseDataset(Dataset):

@@ -26,11 +26,15 @@ class MyCLRHeadParams(object):
                cls_loss_weight,
                xyt_loss_weight,
                seg_loss_weight,
+               test_parameters=dict(conf_threshold=0.4,
+                                    nms_thres=50,
+                                    nms_topk=4),
                n_priors=192,
                refine_layers=3,
                prior_fea_channels=64,
                sample_points=36,
-               fc_hidden_dim=64):
+               fc_hidden_dim=64,
+               max_lanes=4):
     self.sample_y = sample_y
     self.log_interval = log_interval # 1000
     self.n_classes = n_classes # 4 + 1
@@ -41,12 +45,14 @@ class MyCLRHeadParams(object):
     self.cls_loss_weight = cls_loss_weight # 2.0
     self.xyt_loss_weight = xyt_loss_weight # 0.2
     self.seg_loss_weight = seg_loss_weight # 1.0
+    self.test_parameters = test_parameters
 
     self.n_priors = n_priors # 192
     self.refine_layers = refine_layers # 3
     self.prior_fea_channels = prior_fea_channels # 64
     self.sample_points = sample_points # 36
     self.fc_hidden_dim = fc_hidden_dim # 64
+    self.max_lanes = max_lanes # 4
 
 
 class MyCLRHead(nn.Module):
@@ -55,7 +61,8 @@ class MyCLRHead(nn.Module):
                       n_points=72,
                       n_fc=2,
                       img_w=400,
-                      img_h=160):
+                      img_h=160,
+                      max_lanes=4):
     print("Init MyCLRHead...")
     super(MyCLRHead, self).__init__()
     
@@ -124,8 +131,8 @@ class MyCLRHead(nn.Module):
     self._init_prior_embeddings()
     init_priors, priors_on_featmap = self.generate_priors_from_embeddings() #None, None
 
-    print("init_priors: ", init_priors)
-    print("priors_on_featmap: ", priors_on_featmap)
+    # print("init_priors: ", init_priors)
+    # print("priors_on_featmap: ", priors_on_featmap)
 
     self.register_buffer(name='priors', tensor=init_priors)
     self.register_buffer(name='priors_on_featmap', tensor=priors_on_featmap)
@@ -271,19 +278,16 @@ class MyCLRHead(nn.Module):
         seg: segmentation result for auxiliary loss
     '''
     # x - ([],[],[]) features from fpn
-    print("MyCLRHead forward...")
-    print("MyCLRHead forward len(x): ", len(x))
-    print("MyCLRHead forward x[0].shape: ", x[0].shape)
-    print("MyCLRHead forward x[1].shape: ", x[1].shape)
-    print("MyCLRHead forward x[2].shape: ", x[2].shape)
+    # print("MyCLRHead forward...")
+    # print("MyCLRHead forward len(x): ", len(x))
+    # print("MyCLRHead forward x[0].shape: ", x[0].shape)
+    # print("MyCLRHead forward x[1].shape: ", x[1].shape)
+    # print("MyCLRHead forward x[2].shape: ", x[2].shape)
     # print("MyCLRHead forward **kwargs: ", kwargs['batch'].keys())
-    out = {}
-
     batch_features = list(x[len(x) - self.refine_layers:])
     batch_features.reverse()
     batch_size = batch_features[-1].shape[0]
 
-    print("training: ", self.training)
     if self.training:
       self.priors, self.priors_on_featmap = self.generate_priors_from_embeddings()
     
@@ -436,7 +440,7 @@ class MyCLRHead(nn.Module):
       cls_acc = []
 
       cls_acc_stage = []
-      print("output len predictions_lists: ", len(output['predictions_lists']))
+      # print("output len predictions_lists: ", len(output['predictions_lists']))
       for stage in range(self.refine_layers):
           predictions_list = predictions_lists[stage]
           for predictions, target in zip(predictions_list, targets):
@@ -543,7 +547,7 @@ class MyCLRHead(nn.Module):
       decoded = []
       for predictions in output:
           # filter out the conf lower than conf threshold
-          threshold = self.cfg.test_parameters.conf_threshold
+          threshold = self.cfg.test_parameters['conf_threshold']
           scores = softmax(predictions[:, :2])[:, 1]
           keep_inds = scores >= threshold
           predictions = predictions[keep_inds]
@@ -562,7 +566,7 @@ class MyCLRHead(nn.Module):
           keep, num_to_keep, _ = nms(
               nms_predictions,
               scores,
-              overlap=self.cfg.test_parameters.nms_thres,
+              overlap=self.cfg.test_parameters['nms_thres'],
               top_k=self.cfg.max_lanes)
           keep = keep[:num_to_keep]
           predictions = predictions[keep]

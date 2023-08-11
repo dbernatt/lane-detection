@@ -32,6 +32,16 @@ data:
             type: 'ToTensor'
             keys: ['img', 'lane_line', 'seg']
             cfg: ${data.init_args.cfg}
+      val:
+        - generateLaneLine:
+            type: 'MyGenerateLaneLine'
+            cfg: ${data.init_args.cfg}
+            training: false
+            transforms: null 
+        - toTensor: 
+            type: 'ToTensor'
+            keys: ['img']
+            cfg: ${data.init_args.cfg}
 
 model:
   class_path: Runner
@@ -82,16 +92,22 @@ model:
             refine_layers: 3
             fc_hidden_dim: 64
             sample_points: 36
+            test_parameters:
+              conf_threshold: 0.4
+              nms_thres: 50
+              nms_topk: 4 # (max_lanes)
+            
         
 trainer:
   logger: 
     class_path: pytorch_lightning.loggers.TensorBoardLogger
     init_args:
       save_dir: './logs/'
-  fast_dev_run: false
+  fast_dev_run: true
   benchmark: true
   deterministic: false
   devices: 'auto'
   accelerator: 'auto'
   log_every_n_steps: 1
+
 

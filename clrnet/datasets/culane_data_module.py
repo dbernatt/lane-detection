@@ -48,17 +48,16 @@ class CULaneDataModule(pl.LightningDataModule):
 
     if stage == "fit":
       print('fit: setup...')
-      self.split = 'train'
-      self.culane_train_set = CULaneDataset(self.cfg, self.split, self.processes['train'])
-    
+      print('fit: train_set setup...')
+      self.culane_train_set = CULaneDataset(self.cfg, 'train', self.processes['train'])
+      print('fit: val_set setup...')
+      self.culane_val_set = CULaneDataset(self.cfg, 'val', self.processes['val'])
+
     # Assign test dataset for use in dataloader(s)
     if stage == "test":
       print('test: setup...')
       self.split = 'test'
-
-    if stage == "predict":
-      print('predict: setup...')
-      self.split = 'val'
+      self.culane_test_set = CULaneDataset(self.cfg, self.split, self.processes['test'])
 
     print('Done.')
     return
@@ -95,9 +94,24 @@ class CULaneDataModule(pl.LightningDataModule):
 
   def val_dataloader(self):
     print('Create val dataloader...')
+    data_loader = DataLoader(
+          self.culane_val_set,
+          batch_size=self.cfg.batch_size,
+          shuffle=False,
+          num_workers=self.cfg.workers,
+          pin_memory=False,
+          drop_last=False,
+          )
+    return data_loader
 
   def test_dataloader(self):
     print('Create test dataloader...')
-
-  def predict_dataloader(self):
-    print('Create predict dataloader...')
+    data_loader = DataLoader(
+          self.culane_test_set,
+          batch_size=self.cfg.batch_size,
+          shuffle=False,
+          num_workers=self.cfg.workers,
+          pin_memory=False,
+          drop_last=False,
+          )
+    return data_loader
