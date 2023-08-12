@@ -25,6 +25,8 @@ class BaseDataset(Dataset):
         self.processes = Process(processes)
 
     def view(self, predictions, img_metas):
+        print("img_metas: ", img_metas)
+        print("predictions: ", predictions)
         img_metas = [item for img_meta in img_metas.data for item in img_meta]
         for lanes, img_meta in zip(predictions, img_metas):
             img_name = img_meta['img_name']

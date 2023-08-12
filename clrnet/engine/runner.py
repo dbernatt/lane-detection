@@ -35,8 +35,11 @@ class Runner(pl.LightningModule):
     print('Init Runner...')
     super().__init__()
 
+    
+
     self.save_hyperparameters(ignore=['backbone', 'neck', 'heads'])
     self.automatic_optimization = False
+    self.view = True
     # self.backbone = backbone
     # self.neck = neck
     # self.heads = heads
@@ -113,16 +116,29 @@ class Runner(pl.LightningModule):
       print("Validation step...")
 
       output = self(batch)
+      print("output: ", output.shape)
       # print(self.net.modules)
       # print(self.net.modules.heads)
-      output = self.net.heads.get_lanes(output)
+      output_lanes = self.net.heads.get_lanes(output)
+      print("output_lanes: ", output_lanes)
+      print("output_lanes over.")
 
-      self.predictions.extend(output)
+      self.predictions.extend(output_lanes)
 
   def on_validation_batch_end(self, outputs, batch, batch_idx, dataloader_idx: int = 0) -> None:
     print('on_validation_batch_end...')
-    if self.cfg.view:
-      self.val_loader.dataset.view(outputs, batch['meta'])
+    print("self.predictions : ", self.predictions)
+    if self.view:
+      # print(self.trainer.val_dataloaders == self.val_dataloader)
+      # print(self.val_dataloader())
+      # val_dataloader = self.val_dataloader()
+      # val_dataset
+      print("outputs: ", outputs)
+      print("batch len: ", len(batch))
+      print("batch img shape: ", batch['img'].shape)
+      print("batch keys: ", batch.keys())
+      print("batch meta: ", batch['meta'])
+      self.trainer.val_dataloaders.dataset.view(outputs, batch['meta'])
 
   def on_validation_start(self) -> None:
     print('\non_validation_start...')
@@ -130,8 +146,8 @@ class Runner(pl.LightningModule):
 
   def on_validation_end(self):
     print('on_validation_end...')
-    metric = self.val_loader.dataset.evaluate(self.predictions,
-                                              self.cfg.work_dir)
+    print("self.predictions : ", self.predictions)
+    metric = self.val_dataloader.dataset.evaluate(self.predictions, self.cfg.work_dir)
     self.log('metric', metric)
 
   def configure_optimizers(self):

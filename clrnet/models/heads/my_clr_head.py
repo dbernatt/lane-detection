@@ -4,13 +4,13 @@ import torch.nn as nn
 import os.path as osp
 import math
 import torch.nn.functional as F
-from torchvision.ops import nms
+# from torchvision.ops import nms
 
 from clrnet.models.utils.seg_decoder import SegDecoder
 from clrnet.models.utils.roi_gather import ROIGather
 from clrnet.models.losses.focal_loss import FocalLoss, SoftmaxFocalLoss
 from clrnet.models.losses.accuracy import accuracy
-# from clrnet.ops import nms
+from clrnet.ops import nms
 from clrnet.models.utils.dynamic_assign import assign
 from clrnet.models.losses.lineiou_loss import liou_loss
 from clrnet.utils.lane import Lane
@@ -63,6 +63,8 @@ class MyCLRHead(nn.Module):
                       n_fc=2,
                       img_w=400,
                       img_h=160,
+                      ori_img_h=160,
+                      ori_img_w=400,
                       max_lanes=4):
     print("Init MyCLRHead...")
     super(MyCLRHead, self).__init__()
@@ -78,6 +80,8 @@ class MyCLRHead(nn.Module):
     self.prior_fea_channels = self.cfg.prior_fea_channels # 64
     self.n_priors = self.cfg.n_priors # 192
     self.fc_hidden_dim = self.cfg.fc_hidden_dim
+    self.ori_img_h, self.ori_img_w = ori_img_h, ori_img_w
+    self.cut_height = 73
 
     # sample_x_indexes is a constant, which stores the random sample points x
     self.register_buffer(name='sample_x_indexs', 
@@ -378,11 +382,16 @@ class MyCLRHead(nn.Module):
       '''
       Convert predictions to internal Lane structure for evaluation.
       '''
+      print("predictions_to_pred...")
       self.prior_ys = self.prior_ys.to(predictions.device)
       self.prior_ys = self.prior_ys.double()
       lanes = []
-      for lane in predictions:
+      # print("predictions: ", predictions)
+      # print("predictions.shape: ", predictions.shape) # torch.Size([4, 78])
+      for index, lane in enumerate(predictions):
+          print(f"start {index} lane: {lane}")
           lane_xs = lane[6:]  # normalized value
+          print("lane_xs 1: ", lane_xs)
           start = min(max(0, int(round(lane[2].item() * self.n_strips))),
                       self.n_strips)
           length = int(round(lane[5].item()))
@@ -392,7 +401,7 @@ class MyCLRHead(nn.Module):
           # if the prediction does not start at the bottom of the image,
           # extend its prediction until the x is outside the image
           mask = ~((((lane_xs[:start] >= 0.) & (lane_xs[:start] <= 1.)
-                      ).cpu().numpy()[::-1].cumprod()[::-1]).astype(np.bool))
+                      ).cpu().numpy()[::-1].cumprod()[::-1]).astype(np.bool_))
           lane_xs[end + 1:] = -2
           lane_xs[:start][mask] = -2
           lane_ys = self.prior_ys[lane_xs >= 0]
@@ -400,8 +409,11 @@ class MyCLRHead(nn.Module):
           lane_xs = lane_xs.flip(0).double()
           lane_ys = lane_ys.flip(0)
 
-          lane_ys = (lane_ys * (self.cfg.ori_img_h - self.cfg.cut_height) +
-                      self.cfg.cut_height) / self.cfg.ori_img_h
+          lane_ys = (lane_ys * (self.ori_img_h - self.cut_height) +
+                      self.cut_height) / self.ori_img_h
+
+
+          # print("len(lane_xs) : ", len(lane_xs))
           if len(lane_xs) <= 1:
               continue
           points = torch.stack(
@@ -413,7 +425,9 @@ class MyCLRHead(nn.Module):
                           'start_y': lane[2],
                           'conf': lane[1]
                       })
+          # print(f"end {index} lane: {lane}")
           lanes.append(lane)
+      print("return lanes: ", lanes)
       return lanes
 
   def loss(self,
@@ -543,18 +557,24 @@ class MyCLRHead(nn.Module):
       '''
       Convert model output to lanes.
       '''
+      print("get_lanes...")
+      # print("output: ", output.shape)
       softmax = nn.Softmax(dim=1)
 
       decoded = []
       for predictions in output:
+          # print("predictions: ", predictions.shape)
           # filter out the conf lower than conf threshold
           threshold = self.cfg.test_parameters['conf_threshold']
           scores = softmax(predictions[:, :2])[:, 1]
+          print(scores)
+          print(scores.shape)
           keep_inds = scores >= threshold
           predictions = predictions[keep_inds]
           scores = scores[keep_inds]
 
           if predictions.shape[0] == 0:
+
               decoded.append([])
               continue
           nms_predictions = predictions.detach().clone()
@@ -564,25 +584,32 @@ class MyCLRHead(nn.Module):
           nms_predictions[...,
                           5:] = nms_predictions[..., 5:] * (self.img_w - 1)
 
+          print(nms_predictions)
+          print(nms_predictions.shape)
           keep, num_to_keep, _ = nms(
               nms_predictions,
               scores,
-              iou_threshold=self.cfg.test_parameters['nms_thres'])
-              # top_k=self.cfg.max_lanes)
+              overlap=self.cfg.test_parameters['nms_thres'],
+              top_k=self.cfg.max_lanes)
           keep = keep[:num_to_keep]
+          print(keep)
           predictions = predictions[keep]
-
+          # print("predictions: ", predictions)
           if predictions.shape[0] == 0:
               decoded.append([])
               continue
 
           predictions[:, 5] = torch.round(predictions[:, 5] * self.n_strips)
+          # print("predictions 2: ", predictions)
+          # print("predictions 2 shape: ", predictions.shape)
+
           if as_lanes:
               pred = self.predictions_to_pred(predictions)
+              print("pred: ", pred)
           else:
               pred = predictions
           decoded.append(pred)
-
+      print("decoded: ", decoded)
       return decoded
 
 

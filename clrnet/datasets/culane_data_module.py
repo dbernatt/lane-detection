@@ -29,9 +29,9 @@ class CULaneDataModule(pl.LightningDataModule):
     print('data module cfg: ', self.cfg)
     print('data module processes: ', self.processes)
 
-    self.culane_train_set = None
-    self.culane_val_set = None
-    self.culane_test_set = None
+    self.train_set = None
+    self.val_set = None
+    self.test_set = None
 
   def worker_init_fn(worker_id, seed):
       worker_seed = worker_id + seed
@@ -49,24 +49,27 @@ class CULaneDataModule(pl.LightningDataModule):
     if stage == "fit":
       print('fit: setup...')
       print('fit: train_set setup...')
-      self.culane_train_set = CULaneDataset(self.cfg, 'train', self.processes['train'])
+      self.train_set = CULaneDataset(self.cfg, 'train', self.processes['train'])
       print('fit: val_set setup...')
-      self.culane_val_set = CULaneDataset(self.cfg, 'val', self.processes['val'])
+      self.val_set = CULaneDataset(self.cfg, 'val', self.processes['val'])
 
     # Assign test dataset for use in dataloader(s)
     if stage == "test":
       print('test: setup...')
       self.split = 'test'
-      self.culane_test_set = CULaneDataset(self.cfg, self.split, self.processes['test'])
+      self.test_set = CULaneDataset(self.cfg, self.split, self.processes['test'])
 
     print('Done.')
     return
+  
+  def view(self):
+    return "view"
 
   def train_dataloader(self):
     print('Create train dataloader...')
     # init_fn = partial(self.worker_init_fn, seed=self.cfg['seed'])
     data_loader = DataLoader(
-          self.culane_train_set,
+          self.train_set,
           batch_size=self.cfg.batch_size,
           shuffle=True,
           num_workers=self.cfg.workers,
@@ -88,30 +91,28 @@ class CULaneDataModule(pl.LightningDataModule):
         'meta': { 'full_img_path': [img1path, img2path, ... img(24 -1)path]}
       }
     """
-    # self.culane_train_set.view(item[])
+    # self.train_set.view(item[])
     print('data_loader len:', len(data_loader))
     return data_loader
 
   def val_dataloader(self):
     print('Create val dataloader...')
     data_loader = DataLoader(
-          self.culane_val_set,
+          dataset=self.val_set,
           batch_size=self.cfg.batch_size,
           shuffle=False,
           num_workers=self.cfg.workers,
           pin_memory=False,
-          drop_last=False,
-          )
+          drop_last=False)
     return data_loader
 
   def test_dataloader(self):
     print('Create test dataloader...')
     data_loader = DataLoader(
-          self.culane_test_set,
+          self.test_set,
           batch_size=self.cfg.batch_size,
           shuffle=False,
           num_workers=self.cfg.workers,
           pin_memory=False,
-          drop_last=False,
-          )
+          drop_last=False)
     return data_loader

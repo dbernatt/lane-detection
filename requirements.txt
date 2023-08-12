@@ -1,15 +1,13 @@
 addict==2.4.0
 imgaug==0.4.0
-mmcv==2.0.1
-numpy==1.22.4
+numpy==1.25.2
 opencv_contrib_python==4.7.0.72
 opencv_python==4.7.0.72
 opencv_python_headless==4.8.0.74
 p_tqdm==1.4.0
 Pillow
-pytorch_lightning==2.0.5
+pytorch_lightning==2.0.6
 PyYAML==6.0
-PyYAML==6.0.1
 scipy==1.11.1
 Shapely==2.0.1
 six==1.16.0

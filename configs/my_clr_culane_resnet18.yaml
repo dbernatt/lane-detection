@@ -103,7 +103,7 @@ trainer:
     class_path: pytorch_lightning.loggers.TensorBoardLogger
     init_args:
       save_dir: './logs/'
-  fast_dev_run: true
+  fast_dev_run: false
   benchmark: true
   deterministic: false
   devices: 'auto'

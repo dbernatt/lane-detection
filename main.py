@@ -25,8 +25,9 @@ def main(args: ArgsType = None):
                   )
 
 if __name__ == '__main__':
-  print(torch.__version__)
-  # print(torch.__file__)
-  # print(torch.version.cuda)
-  print(torchvision.__version__)
+  print(torch.__version__) # 2.0.1+cu118
+  print(torchvision.__version__) # 0.15.2+cu118
+  print(torch.__file__) # /usr/local/lib/python3.10/site-packages/torch/__init__.py
+  print(torch.cuda.is_available()) # True
+  print(torch.version.cuda) # 11.8
   main()

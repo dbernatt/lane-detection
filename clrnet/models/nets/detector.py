@@ -31,8 +31,9 @@ class Detector(nn.Module):
 
         print("Init Detector Done.")
 
-    def get_lanes(self):
-        return self.heads.get_lanes(output)
+    # def get_lanes(self):
+    #   print("Detector get_lanes...")
+    #   return self.heads.get_lanes(output)
 
     def forward(self, batch):
         output = {}
