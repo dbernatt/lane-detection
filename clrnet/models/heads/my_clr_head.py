@@ -82,6 +82,7 @@ class MyCLRHead(nn.Module):
     self.fc_hidden_dim = self.cfg.fc_hidden_dim
     self.ori_img_h, self.ori_img_w = ori_img_h, ori_img_w
     self.cut_height = 73
+    self.training = True
 
     # sample_x_indexes is a constant, which stores the random sample points x
     self.register_buffer(name='sample_x_indexs', 
@@ -374,6 +375,10 @@ class MyCLRHead(nn.Module):
                                   dim=1)
         seg = self.seg_decoder(seg_features)
         output = {'predictions_lists': predictions_lists, 'seg': seg}
+        # print("f out: ", output.keys())
+        # print("f out predictions_lists shape: ", 
+        # len(output['predictions_lists']))
+        # print("f out seg: ", output['seg'])
         return self.loss(output, kwargs['batch'])
 
     return predictions_lists[-1]
@@ -389,9 +394,9 @@ class MyCLRHead(nn.Module):
       # print("predictions: ", predictions)
       # print("predictions.shape: ", predictions.shape) # torch.Size([4, 78])
       for index, lane in enumerate(predictions):
-          print(f"start {index} lane: {lane}")
+          # print(f"start {index} lane: {lane}")
           lane_xs = lane[6:]  # normalized value
-          print("lane_xs 1: ", lane_xs)
+          # print("lane_xs 1: ", lane_xs)
           start = min(max(0, int(round(lane[2].item() * self.n_strips))),
                       self.n_strips)
           length = int(round(lane[5].item()))
@@ -567,8 +572,8 @@ class MyCLRHead(nn.Module):
           # filter out the conf lower than conf threshold
           threshold = self.cfg.test_parameters['conf_threshold']
           scores = softmax(predictions[:, :2])[:, 1]
-          print(scores)
-          print(scores.shape)
+          # print(scores)
+          # print(scores.shape)
           keep_inds = scores >= threshold
           predictions = predictions[keep_inds]
           scores = scores[keep_inds]
@@ -584,15 +589,15 @@ class MyCLRHead(nn.Module):
           nms_predictions[...,
                           5:] = nms_predictions[..., 5:] * (self.img_w - 1)
 
-          print(nms_predictions)
-          print(nms_predictions.shape)
+          # print(nms_predictions)
+          # print(nms_predictions.shape)
           keep, num_to_keep, _ = nms(
               nms_predictions,
               scores,
               overlap=self.cfg.test_parameters['nms_thres'],
               top_k=self.cfg.max_lanes)
           keep = keep[:num_to_keep]
-          print(keep)
+          # print(keep)
           predictions = predictions[keep]
           # print("predictions: ", predictions)
           if predictions.shape[0] == 0:
@@ -605,7 +610,7 @@ class MyCLRHead(nn.Module):
 
           if as_lanes:
               pred = self.predictions_to_pred(predictions)
-              print("pred: ", pred)
+              # print("pred: ", pred)
           else:
               pred = predictions
           decoded.append(pred)

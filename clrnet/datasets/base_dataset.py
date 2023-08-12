@@ -27,7 +27,13 @@ class BaseDataset(Dataset):
     def view(self, predictions, img_metas):
         print("img_metas: ", img_metas)
         print("predictions: ", predictions)
-        img_metas = [item for img_meta in img_metas.data for item in img_meta]
+
+        # img_metas = [item for img_meta in img_metas.data for item in img_meta]
+        img_metas = []
+        for img_meta in img_metas.data:
+          for item in img_meta:
+              img_metas.append(item)
+        
         for lanes, img_meta in zip(predictions, img_metas):
             img_name = img_meta['img_name']
             img = cv2.imread(osp.join(self.data_root, img_name))

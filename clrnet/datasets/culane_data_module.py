@@ -49,15 +49,15 @@ class CULaneDataModule(pl.LightningDataModule):
     if stage == "fit":
       print('fit: setup...')
       print('fit: train_set setup...')
-      self.train_set = CULaneDataset(self.cfg, 'train', self.processes['train'])
+      self.train_set = CULaneDataset(self.cfg, 'train', self.processes['train'], training=True)
       print('fit: val_set setup...')
-      self.val_set = CULaneDataset(self.cfg, 'val', self.processes['val'])
+      self.val_set = CULaneDataset(self.cfg, 'val', self.processes['val'], training=False)
 
     # Assign test dataset for use in dataloader(s)
     if stage == "test":
       print('test: setup...')
       self.split = 'test'
-      self.test_set = CULaneDataset(self.cfg, self.split, self.processes['test'])
+      self.test_set = CULaneDataset(self.cfg, self.split, self.processes['test'], training=False)
 
     print('Done.')
     return

@@ -28,6 +28,7 @@ class Detector(nn.Module):
         self.neck = neck
         self.heads = heads
         self.aggregator = None
+        self.training = True
 
         print("Init Detector Done.")
 
@@ -49,5 +50,5 @@ class Detector(nn.Module):
             output = self.heads(fea, batch=batch)
         else:
             output = self.heads(fea)
-
+            
         return output

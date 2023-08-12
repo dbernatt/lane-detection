@@ -8,7 +8,7 @@ from tqdm import tqdm
 import logging
 import pickle as pkl
 from torch.utils.data import Dataset
-from clrnet.utils import culane_metric
+import clrnet.utils.culane_metric as culane_metric
 
 LIST_FILE = {
     'train': 'list/train_gt.txt',

@@ -144,7 +144,7 @@ def eval_predictions(pred_dir,
     logger.info('Calculating metric for List: {}'.format(list_path))
     predictions = load_culane_data(pred_dir, list_path)
     annotations = load_culane_data(anno_dir, list_path)
-    img_shape = (590, 1640, 3)
+    img_shape = (160, 400, 3)
     if sequential:
         results = map(
             partial(culane_metric,
