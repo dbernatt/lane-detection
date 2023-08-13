@@ -29,7 +29,7 @@ CATEGORYS = {
 }
 
 class CULaneDataset(BaseDataset):
-  def __init__(self, cfg, split, processes):
+  def __init__(self, cfg, split, processes=None):
     print('Init CULaneDataset...')
     super().__init__(cfg, split, processes)
     print('split: ', split)

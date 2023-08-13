@@ -13,7 +13,7 @@ import matplotlib as plt
 # from mmcv.parallel import DataContainer as DC
 
 class BaseDataset(Dataset):
-    def __init__(self, cfg, split, processes):
+    def __init__(self, cfg, split, processes=None):
         print('Init BaseDataset...')
         self.cfg = cfg
         self.work_dirs = self.cfg.work_dirs
@@ -22,8 +22,11 @@ class BaseDataset(Dataset):
 
         print('BaseDataset cfg: ', self.cfg)
         print('BaseDataset processes: ', processes)
-        self.processes = Process(processes)
-
+        if processes:
+          self.processes = Process(processes)
+        else:
+          self.processes = None
+          
     def view(self, predictions, img_metas):
         print("img_metas: ", img_metas)
         print("predictions: ", predictions)
@@ -79,7 +82,8 @@ class BaseDataset(Dataset):
                     new_lanes.append(lanes)
                 sample.update({'lanes': new_lanes})
         
-        sample = self.processes(sample)
+        if self.processes:
+          sample = self.processes(sample)
         # print("base img min max: ", sample['img'].min(), sample['img'].max())
         meta = {'full_img_path': data_info['img_path'],
                 'img_name': data_info['img_name']}
