@@ -76,24 +76,11 @@ class Runner(pl.LightningModule):
     loss_stats = output['loss_stats']
     loss = output['loss'].sum()
 
-    stage_0_acc = loss_stats['stage_0_acc']
-    stage_1_acc = loss_stats['stage_1_acc']
-    stage_2_acc = loss_stats['stage_2_acc']
-    cls_loss = loss_stats['cls_loss']
-    reg_xytl_loss = loss_stats['reg_xytl_loss']
-    iou_loss = loss_stats['iou_loss']
-
     # self.logger.experiment.add_image(f"{group_path}/backbone_1", 
     #                                   numpy_image_1, 
     #                                   dataformats='NCHW') # group view: CHW
     
-    self.log("train_loss_sum", loss, on_step=True, on_epoch=True, prog_bar=True, logger=True)
-    self.log("train_cls_loss", cls_loss, on_step=True, on_epoch=True, logger=True)
-    self.log("train_reg_xytl_loss", reg_xytl_loss, on_step=True, on_epoch=True, logger=True)
-    self.log("train_iou_loss", iou_loss, on_step=True, on_epoch=True, logger=True)
-    self.log("train_stage_0_acc", stage_0_acc, on_step=True, on_epoch=True, logger=True)
-    self.log("train_stage_1_acc", stage_1_acc, on_step=True, on_epoch=True, logger=True)
-    self.log("train_stage_2_acc", stage_2_acc, on_step=True, on_epoch=True, logger=True)
+    self.log("train_loss", losses, on_step=True, on_epoch=True, prog_bar=True, logger=True)
 
     return loss
 

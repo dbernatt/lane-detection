@@ -1,0 +1,127 @@
+cfg:
+  data_root: data/CULane
+  batch_size: 24
+  ori_img_w: 400
+  ori_img_h: 160
+  img_w: 400
+  img_h: 160
+  cut_height: 73
+  work_dirs: work_dirs/clr/r18_culane
+  img_norm:
+    mean:
+    - 0.485
+    - 0.456
+    - 0.406
+    std:
+    - 0.229
+    - 0.224
+    - 0.225
+  n_points: 72
+  max_lanes: 4
+  workers: 2
+processes:
+  train:
+  - generateLaneLine:
+      type: MyGenerateLaneLine
+      cfg:
+        data_root: data/CULane
+        batch_size: 24
+        ori_img_w: 400
+        ori_img_h: 160
+        img_w: 400
+        img_h: 160
+        cut_height: 73
+        work_dirs: work_dirs/clr/r18_culane
+        img_norm:
+          mean:
+          - 0.485
+          - 0.456
+          - 0.406
+          std:
+          - 0.229
+          - 0.224
+          - 0.225
+        n_points: 72
+        max_lanes: 4
+        workers: 2
+      training: true
+      transforms: null
+  - toTensor:
+      type: ToTensor
+      keys:
+      - img
+      - lane_line
+      - seg
+      cfg:
+        data_root: data/CULane
+        batch_size: 24
+        ori_img_w: 400
+        ori_img_h: 160
+        img_w: 400
+        img_h: 160
+        cut_height: 73
+        work_dirs: work_dirs/clr/r18_culane
+        img_norm:
+          mean:
+          - 0.485
+          - 0.456
+          - 0.406
+          std:
+          - 0.229
+          - 0.224
+          - 0.225
+        n_points: 72
+        max_lanes: 4
+        workers: 2
+  val:
+  - generateLaneLine:
+      type: MyGenerateLaneLine
+      cfg:
+        data_root: data/CULane
+        batch_size: 24
+        ori_img_w: 400
+        ori_img_h: 160
+        img_w: 400
+        img_h: 160
+        cut_height: 73
+        work_dirs: work_dirs/clr/r18_culane
+        img_norm:
+          mean:
+          - 0.485
+          - 0.456
+          - 0.406
+          std:
+          - 0.229
+          - 0.224
+          - 0.225
+        n_points: 72
+        max_lanes: 4
+        workers: 2
+      training: false
+      transforms: null
+  - toTensor:
+      type: ToTensor
+      keys:
+      - img
+      cfg:
+        data_root: data/CULane
+        batch_size: 24
+        ori_img_w: 400
+        ori_img_h: 160
+        img_w: 400
+        img_h: 160
+        cut_height: 73
+        work_dirs: work_dirs/clr/r18_culane
+        img_norm:
+          mean:
+          - 0.485
+          - 0.456
+          - 0.406
+          std:
+          - 0.229
+          - 0.224
+          - 0.225
+        n_points: 72
+        max_lanes: 4
+        workers: 2
+  test: null
