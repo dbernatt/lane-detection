@@ -29,13 +29,13 @@ class Decoder:
 class Runner(pl.LightningModule):
 
   def __init__(self,
-                     backbone: ResNetWrapper, 
-                     neck: FPN | None, 
+                     backbone: ResNetWrapper,
+                     neck: FPN | None,
                      heads: MyCLRHead):
     print('Init Runner...')
     super().__init__()
 
-    
+
 
     self.save_hyperparameters(ignore=['backbone', 'neck', 'heads'])
     self.automatic_optimization = False
@@ -50,6 +50,7 @@ class Runner(pl.LightningModule):
     print('Init Runner Done.')
 
   def forward(self, batch):
+    print("seg: ", batch['seg'].shape)
     return self.net(batch)
 
   def training_step(self, batch, batch_idx):
@@ -60,6 +61,7 @@ class Runner(pl.LightningModule):
     imgs = batch['img'] # torch.Size([24, 3, 160, 400])
     lane_line = batch['lane_line']
     seg = batch['seg']
+    print("seg: ", seg.shape)
     meta = batch['meta'] # {'full_img_path': [...]}
 
     # print('img len: ', len(imgs)) # 24
@@ -76,10 +78,10 @@ class Runner(pl.LightningModule):
     loss_stats = output['loss_stats']
     loss = output['loss'].sum()
 
-    # self.logger.experiment.add_image(f"{group_path}/backbone_1", 
-    #                                   numpy_image_1, 
+    # self.logger.experiment.add_image(f"{group_path}/backbone_1",
+    #                                   numpy_image_1,
     #                                   dataformats='NCHW') # group view: CHW
-    
+
     self.log("train_loss", losses, on_step=True, on_epoch=True, prog_bar=True, logger=True)
 
     return loss
@@ -102,14 +104,14 @@ class Runner(pl.LightningModule):
     # print('outputs: ', outputs)
     # output_lanes = self.net.heads.get_lanes(batch)
     # print('output_lanes: ', output_lanes)
-  
+
   # def on_train_epoch_end(self):
   #   pass
     # all_preds = torch.stack(self.training_step_outputs)
     # do something with all preds
     # ...
     # self.training_step_outputs.clear()  # free memory
-  
+
   # def on_train_start(self) -> None:
   #   print('on train start | ')
   #   return super().on_train_start()
@@ -160,7 +162,7 @@ class Runner(pl.LightningModule):
   # def on_validation_end(self):
   #   print('on_validation_end...')
   #   print("self.predictions : ", self.predictions)
-  #   metric = self.trainer.val_dataloaders.dataset.evaluate(self.predictions, 
+  #   metric = self.trainer.val_dataloaders.dataset.evaluate(self.predictions,
   #                                                          self.workdirs)
   #   self.log('metric', metric)
 

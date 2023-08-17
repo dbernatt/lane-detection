@@ -2,41 +2,93 @@ data:
   class_path: clrnet.datasets.CULaneDataModule
   init_args:
     cfg:
-      data_root: 'data/CULane'
+      data_root: "data/CULane"
       batch_size: 24
-      ori_img_w: 400
-      ori_img_h: 160
-      img_w: 400
-      img_h: 160
-      cut_height: 73
-      work_dirs: 'work_dirs/clr/r18_culane'
-      img_norm: 
+      ori_img_w: 1640
+      ori_img_h: 590
+      img_w: 800
+      img_h: 320
+      cut_height: 270
+      work_dirs: "work_dirs/clr/r18_culane"
+      img_norm:
         mean: [103.939, 116.779, 123.68]
+        #mean: [0.485, 0.456, 0.406]
         std: [1., 1., 1.]
-      num_points: 72
+        #std: [0.229, 0.224, 0.225]
+      n_points: 72
       max_lanes: 4
-      workers: 2
+      workers: 4
     processes:
       train:
-        - generateLaneLine:
-            type: 'GenerateLaneLine'
-            cfg: ${data.init_args.cfg}
-            training: true
-            transforms: null    
-        #- Normalize:
-        #  img_norm: ${data.init_args.cfg.img_norm}
-        - toTensor: 
-            type: 'ToTensor'
-            keys: ['img', 'lane_line', 'seg']
-            cfg: ${data.init_args.cfg}
+        - type: "MyGenerateLaneLine"
+          cfg: ${data.init_args.cfg}
+          transforms:
+            - name: "Resize"
+              parameters:
+                size:
+                  height: ${data.init_args.cfg.img_h}
+                  width: ${data.init_args.cfg.img_w}
+              p: 1.0
+            - name: "HorizontalFlip"
+              parameters:
+                p: 1.0
+              p: 0.5
+            - name: "ChannelShuffle"
+              parameters:
+                p: 1.0
+              p: 0.1
+            - name: "MultiplyAndAddToBrightness"
+              parameters:
+                mul: [0.85, 1.15]
+                add: [-10, 10]
+              p: 0.6
+            - name: "AddToHueAndSaturation"
+              parameters:
+                value: [-10, 10]
+              p: 0.7
+            - name: "OneOf"
+              transforms:
+                - name: "MotionBlur"
+                  parameters:
+                    k: [3, 5]
+                - name: "MedianBlur"
+                  parameters:
+                    k: [3, 5]
+              p: 0.2
+            - name: "Affine"
+              parameters:
+                translate_percent:
+                  x: [-0.1, 0.1]
+                  y: [-0.1, 0.1]
+                rotate: [-10, 10]
+                scale: [0.8, 1.2]
+              p: 0.7
+            - name: "Resize"
+              parameters:
+                size:
+                  height: ${data.init_args.cfg.img_h}
+                  width: ${data.init_args.cfg.img_w}
+              p: 1.0
+        - type: "ToTensor"
+          keys: ["img", "lane_line", "seg"]
+          cfg: ${data.init_args.cfg}
+      val:
+        - type: "MyGenerateLaneLine"
+          cfg: ${data.init_args.cfg}
+          training: false
+          transforms: null
+        - type: "ToTensor"
+          keys: ["img"]
+          cfg: ${data.init_args.cfg}
+      test:
 
 model:
-  class_path: CLRNet
+  class_path: Runner
   init_args:
     backbone:
       class_path: clrnet.models.backbones.ResNetWrapper
       init_args:
-        resnet: 'resnet18'
+        resnet: "resnet18"
         pretrained: true
         out_conv: false
     neck:
@@ -47,26 +99,47 @@ model:
         num_outs: 3
         start_level: 0
         end_level: -1
-        upsample_cfg: 
-          mode: 'nearest'
+        upsample_cfg:
+          mode: "nearest"
         no_norm_on_lateral: false
         conv_cfg: null
         norm_cfg: null
         attention: false
         act_cfg: null
-        init_cfg: 
-          type: 'Xavier'
-          layer: 'Conv2d'
-          distribution: 'uniform'
+        init_cfg:
+          type: "Xavier"
+          layer: "Conv2d"
+          distribution: "uniform"
     heads:
-      class_path: clrnet.models.heads.CLRHead
+      class_path: clrnet.models.heads.MyCLRHead
       init_args:
         cfg:
-          class_path: clrnet.models.heads.CLRHeadParams
+          class_path: clrnet.models.heads.MyCLRHeadParams
           init_args:
-            sample_y: [159, 154, 149, 144, 139, 134, 129, 124, 119, 114, 109, 104, 99, 94, 89, 84, 79, 74, 69]
+            sample_y:
+              [
+                589,
+                569,
+                549,
+                529,
+                509,
+                489,
+                469,
+                449,
+                429,
+                409,
+                389,
+                369,
+                349,
+                329,
+                309,
+                289,
+                269,
+                249,
+                229,
+              ]
             log_interval: 1000
-            num_classes: 5
+            n_classes: 5
             ignore_label: 255
             bg_weight: 0.4
             lr_update_by_epoch: false
@@ -74,10 +147,25 @@ model:
             cls_loss_weight: 2.0
             xyt_loss_weight: 0.2
             seg_loss_weight: 1.0
-        num_priors: 192
-        refine_layers: 3
-        fc_hidden_dim: 64
-        sample_points: 36
-        
+            n_priors: 192
+            prior_fea_channels: 64
+            refine_layers: 3
+            fc_hidden_dim: 64
+            sample_points: 36
+            test_parameters:
+              conf_threshold: 0.4
+              nms_thres: 50
+              nms_topk: 4 # (max_lanes)
+
 trainer:
-  fast_dev_run: true
+  logger:
+    class_path: pytorch_lightning.loggers.TensorBoardLogger
+    init_args:
+      save_dir: "./logs/"
+  fast_dev_run: false
+  benchmark: true
+  deterministic: false
+  devices: "auto"
+  accelerator: "auto"
+  log_every_n_steps: 1
+  max_epochs: 1

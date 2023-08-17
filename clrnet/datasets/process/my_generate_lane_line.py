@@ -91,7 +91,7 @@ class MyGenerateLaneLine(object):
     interp_xs = interp(sample_ys_inside_domain)
 
     # extending line segment ?
-    # extrapolate lane to the bottom of the image with a straight line 
+    # extrapolate lane to the bottom of the image with a straight line
     # using the 2 points closest to the bottom
     two_closest_points = points[:2]
 
@@ -103,9 +103,9 @@ class MyGenerateLaneLine(object):
     # the Y-coordinates that fall outside the original data range
     extrap_ys = sample_ys[sample_ys > domain_max_y]
 
-    # evaluate the extrapolated X-coordinates (extrap_xs) 
+    # evaluate the extrapolated X-coordinates (extrap_xs)
     # corresponding to the Y-coordinates in extrap_ys
-    # The extrap represents the coefficients of the linear polynomial 
+    # The extrap represents the coefficients of the linear polynomial
     # obtained from the np.polyfit() function
     extrap_xs = np.polyval(extrap, extrap_ys)
 
@@ -158,8 +158,8 @@ class MyGenerateLaneLine(object):
     lanes = np.ones(
         (self.max_lanes, 2 + 1 + 1 + 1 + 1 + self.n_offsets), dtype=np.float32
     ) * -eps
-    
-    # lanes.shape [4, 78] 72 
+
+    # lanes.shape [4, 78] 72
 
     lanes_endpoints = np.ones((self.max_lanes, 2))
 
@@ -184,8 +184,8 @@ class MyGenerateLaneLine(object):
       all_xs = np.hstack((xs_outside_image, xs_inside_image))
 
       # activating the lanes from 1, 0 to 0, 1 state
-      lanes[lane_idx, 0] = 0 
-      lanes[lane_idx, 1] = 1 
+      lanes[lane_idx, 0] = 0
+      lanes[lane_idx, 1] = 1
 
       # print("len(xs_outside_image): ", len(xs_outside_image))
       # print("len(xs_inside_image): ", len(xs_inside_image)
@@ -195,18 +195,18 @@ class MyGenerateLaneLine(object):
       lanes[lane_idx, 2] = len(xs_outside_image) / self.n_strips # (n_strips = 72 - 1)
       # start_x
       lanes[lane_idx, 3] = xs_inside_image[0]
-      
+
       # stores the angles
       thetas = []
 
-      # starts from i=1 to skip the first element 
-      # since it will be used as a reference point for calculating angles 
+      # starts from i=1 to skip the first element
+      # since it will be used as a reference point for calculating angles
       # with subsequent points
       for i in range(1, len(xs_inside_image)):
 
-        # calculates the angle between the line segment 
-        # fromed by the current point (xs_inside_image[i]) 
-        # and the reference point (xs_inside_image[0]) 
+        # calculates the angle between the line segment
+        # fromed by the current point (xs_inside_image[i])
+        # and the reference point (xs_inside_image[0])
         # with respect to the horizontal axis
         # reference: LaneATT (1) formula
         # arctg result interval (-pi/2, pi/2) / pi -> (-1/2, 1/2) ->
@@ -223,7 +223,7 @@ class MyGenerateLaneLine(object):
 
       lanes[lane_idx, 4] = avg_theta
       lanes[lane_idx, 5] = len(xs_inside_image)
-      lanes[lane_idx, 6:6 + len(all_xs)] = all_xs 
+      lanes[lane_idx, 6:6 + len(all_xs)] = all_xs
       lanes_endpoints[lane_idx, 0] = (len(all_xs) - 1) / self.n_strips
       lanes_endpoints[lane_idx, 1] = xs_inside_image[-1]
 
@@ -282,7 +282,7 @@ class MyGenerateLaneLine(object):
                 self.logger.critical(
                     'Transform annotation failed 30 times :(')
                 exit()
-    
+
     sample['img'] = img.astype(np.float32) / 255.
     # print("generate lane line: ", sample['img'].min(), sample['img'].max())
     sample['lane_line'] = label
@@ -294,67 +294,67 @@ class MyGenerateLaneLine(object):
     # print("lane_line shape: ", ma.shape(sample['lane_line']))
     """
       sample = {
-        'img_name': 'driver_161_90frame/06030946_0784.MP4/00090.jpg', 
-        'img_path': 'data/CULane/driver_161_90frame/06030946_0784.MP4/00090.jpg', 
-        'mask_path': 'data/CULane/laneseg_label_w16/driver_161_90frame/06030946_0784.MP4/00090.png', 
+        'img_name': 'driver_161_90frame/06030946_0784.MP4/00090.jpg',
+        'img_path': 'data/CULane/driver_161_90frame/06030946_0784.MP4/00090.jpg',
+        'mask_path': 'data/CULane/laneseg_label_w16/driver_161_90frame/06030946_0784.MP4/00090.png',
         'lane_exist': array([0, 1, 1, 1]), (list/train_gt.txt)
         'lanes': [[(166.811, 38.18600000000001), # the x cooridnates is from the 00090.lines.txt
                     (163.122, 40.897999999999996), # the y coordinates is the samples
-                    (159.227, 43.61), 
-                    (155.538, 46.322), 
-                    (151.643, 49.034000000000006), 
-                    (147.918, 51.745999999999995), 
-                    (144.228, 54.458), 
-                    (140.334, 57.16900000000001), 
-                    (136.644, 59.881), 
-                    (132.75, 62.59299999999999), 
-                    (129.024, 65.305), 
-                    (125.334, 68.017), 
-                    (121.44, 70.72900000000001), 
-                    (117.75, 73.441), 
-                    (113.856, 76.15299999999999), 
-                    (110.121, 78.864), 
-                    (106.386, 81.576), 
-                    (102.651, 84.28800000000001), 
-                    (99.166, 87.0)], 
-                    [(191.819, 38.18600000000001), 
-                    (193.838, 40.897999999999996), 
-                    (195.858, 43.61), 
-                    (197.878, 46.322), 
-                    (199.872, 49.034000000000006), 
-                    (201.892, 51.745999999999995), 
-                    (203.912, 54.458), 
-                    (205.932, 57.16900000000001), 
-                    (207.952, 59.881), 
-                    (209.946, 62.59299999999999), 
-                    (211.966, 65.305), 
-                    (213.986, 68.017), 
-                    (216.005, 70.72900000000001), 
-                    (218.025, 73.441), 
-                    (220.138, 76.15299999999999), 
-                    (222.094, 78.864), 
-                    (224.114, 81.576), 
-                    (226.071, 84.28800000000001), 
-                    (227.935, 87.0)], 
-                    [(202.465, 38.18600000000001), 
-                    (209.252, 40.897999999999996), 
-                    (215.901, 43.61), 
-                    (222.549, 46.322), 
-                    (229.337, 49.034000000000006), 
-                    (236.001, 51.745999999999995), 
-                    (242.65, 54.458), 
-                    (249.527, 57.16900000000001), 
-                    (256.176, 59.881), 
-                    (262.824, 62.59299999999999), 
-                    (269.72, 65.305), 
-                    (276.368, 68.017), 
-                    (283.017, 70.72900000000001), 
-                    (289.666, 73.441), 
-                    (296.559, 76.15299999999999), 
-                    (303.207, 78.864), 
-                    (309.856, 81.576), 
-                    (316.734, 84.28800000000001), 
-                    (322.695, 87.0)]], 
+                    (159.227, 43.61),
+                    (155.538, 46.322),
+                    (151.643, 49.034000000000006),
+                    (147.918, 51.745999999999995),
+                    (144.228, 54.458),
+                    (140.334, 57.16900000000001),
+                    (136.644, 59.881),
+                    (132.75, 62.59299999999999),
+                    (129.024, 65.305),
+                    (125.334, 68.017),
+                    (121.44, 70.72900000000001),
+                    (117.75, 73.441),
+                    (113.856, 76.15299999999999),
+                    (110.121, 78.864),
+                    (106.386, 81.576),
+                    (102.651, 84.28800000000001),
+                    (99.166, 87.0)],
+                    [(191.819, 38.18600000000001),
+                    (193.838, 40.897999999999996),
+                    (195.858, 43.61),
+                    (197.878, 46.322),
+                    (199.872, 49.034000000000006),
+                    (201.892, 51.745999999999995),
+                    (203.912, 54.458),
+                    (205.932, 57.16900000000001),
+                    (207.952, 59.881),
+                    (209.946, 62.59299999999999),
+                    (211.966, 65.305),
+                    (213.986, 68.017),
+                    (216.005, 70.72900000000001),
+                    (218.025, 73.441),
+                    (220.138, 76.15299999999999),
+                    (222.094, 78.864),
+                    (224.114, 81.576),
+                    (226.071, 84.28800000000001),
+                    (227.935, 87.0)],
+                    [(202.465, 38.18600000000001),
+                    (209.252, 40.897999999999996),
+                    (215.901, 43.61),
+                    (222.549, 46.322),
+                    (229.337, 49.034000000000006),
+                    (236.001, 51.745999999999995),
+                    (242.65, 54.458),
+                    (249.527, 57.16900000000001),
+                    (256.176, 59.881),
+                    (262.824, 62.59299999999999),
+                    (269.72, 65.305),
+                    (276.368, 68.017),
+                    (283.017, 70.72900000000001),
+                    (289.666, 73.441),
+                    (296.559, 76.15299999999999),
+                    (303.207, 78.864),
+                    (309.856, 81.576),
+                    (316.734, 84.28800000000001),
+                    (322.695, 87.0)]],
         'img': array([[[0.        , 0.        , 0.        ], ... ,
         'mask': array([[1, 1, 1, ..., 1, 1, 1],
                 [1, 1, 1, ..., 1, 1, 1],
@@ -398,7 +398,7 @@ class MyGenerateLaneLine(object):
                               [252.67795 , 147.31853 ],
                               [255.55463 , 152.02318 ],
                               [258.27295 , 156.74956 ],
-                              [260.18945 , 159.999   ]], dtype=float32), 
+                              [260.18945 , 159.999   ]], dtype=float32),
                         array([[227.27261,  84.37118],
                               [234.85556,  88.37383],
                               [242.29956,  92.39723],
@@ -425,7 +425,7 @@ class MyGenerateLaneLine(object):
                       [0, 0, 0, ..., 0, 0, 0],
                       [0, 0, 0, ..., 0, 0, 0],
                       [0, 0, 0, ..., 0, 0, 0]], dtype=uint8)
-        }                
+        }
     """
     # print("sample: ", sample)
     return sample

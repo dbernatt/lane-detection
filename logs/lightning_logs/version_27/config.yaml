@@ -1,0 +1,337 @@
+# pytorch_lightning==2.0.7
+seed_everything: 3701670646
+trainer:
+  accelerator: auto
+  strategy: auto
+  devices: auto
+  num_nodes: 1
+  precision: 32-true
+  logger:
+    class_path: pytorch_lightning.loggers.TensorBoardLogger
+    init_args:
+      save_dir: ./logs/
+      name: lightning_logs
+      version: null
+      log_graph: false
+      default_hp_metric: true
+      prefix: ''
+      sub_dir: null
+  callbacks: null
+  fast_dev_run: false
+  max_epochs: 1
+  min_epochs: null
+  max_steps: -1
+  min_steps: null
+  max_time: null
+  limit_train_batches: null
+  limit_val_batches: null
+  limit_test_batches: null
+  limit_predict_batches: null
+  overfit_batches: 0.0
+  val_check_interval: null
+  check_val_every_n_epoch: 1
+  num_sanity_val_steps: null
+  log_every_n_steps: 1
+  enable_checkpointing: null
+  enable_progress_bar: null
+  enable_model_summary: null
+  accumulate_grad_batches: 1
+  gradient_clip_val: null
+  gradient_clip_algorithm: null
+  deterministic: false
+  benchmark: true
+  inference_mode: true
+  use_distributed_sampler: true
+  profiler: null
+  detect_anomaly: false
+  barebones: false
+  plugins: null
+  sync_batchnorm: false
+  reload_dataloaders_every_n_epochs: 0
+  default_root_dir: null
+ckpt_path: null
+data:
+  class_path: clrnet.datasets.CULaneDataModule
+  init_args:
+    cfg:
+      data_root: data/CULane
+      batch_size: 24
+      ori_img_w: 1640
+      ori_img_h: 590
+      img_w: 800
+      img_h: 320
+      cut_height: 270
+      work_dirs: work_dirs/clr/r18_culane
+      img_norm:
+        mean:
+        - 103.939
+        - 116.779
+        - 123.68
+        std:
+        - 1.0
+        - 1.0
+        - 1.0
+      n_points: 72
+      max_lanes: 4
+      workers: 4
+    processes:
+      train:
+      - type: MyGenerateLaneLine
+        cfg:
+          data_root: data/CULane
+          batch_size: 24
+          ori_img_w: 1640
+          ori_img_h: 590
+          img_w: 800
+          img_h: 320
+          cut_height: 270
+          work_dirs: work_dirs/clr/r18_culane
+          img_norm:
+            mean:
+            - 103.939
+            - 116.779
+            - 123.68
+            std:
+            - 1.0
+            - 1.0
+            - 1.0
+          n_points: 72
+          max_lanes: 4
+          workers: 4
+        transforms:
+        - name: Resize
+          parameters:
+            size:
+              height: 320
+              width: 800
+          p: 1.0
+        - name: HorizontalFlip
+          parameters:
+            p: 1.0
+          p: 0.5
+        - name: ChannelShuffle
+          parameters:
+            p: 1.0
+          p: 0.1
+        - name: MultiplyAndAddToBrightness
+          parameters:
+            mul:
+            - 0.85
+            - 1.15
+            add:
+            - -10
+            - 10
+          p: 0.6
+        - name: AddToHueAndSaturation
+          parameters:
+            value:
+            - -10
+            - 10
+          p: 0.7
+        - name: OneOf
+          transforms:
+          - name: MotionBlur
+            parameters:
+              k:
+              - 3
+              - 5
+          - name: MedianBlur
+            parameters:
+              k:
+              - 3
+              - 5
+          p: 0.2
+        - name: Affine
+          parameters:
+            translate_percent:
+              x:
+              - -0.1
+              - 0.1
+              y:
+              - -0.1
+              - 0.1
+            rotate:
+            - -10
+            - 10
+            scale:
+            - 0.8
+            - 1.2
+          p: 0.7
+        - name: Resize
+          parameters:
+            size:
+              height: 320
+              width: 800
+          p: 1.0
+      - type: ToTensor
+        keys:
+        - img
+        - lane_line
+        - seg
+        cfg:
+          data_root: data/CULane
+          batch_size: 24
+          ori_img_w: 1640
+          ori_img_h: 590
+          img_w: 800
+          img_h: 320
+          cut_height: 270
+          work_dirs: work_dirs/clr/r18_culane
+          img_norm:
+            mean:
+            - 103.939
+            - 116.779
+            - 123.68
+            std:
+            - 1.0
+            - 1.0
+            - 1.0
+          n_points: 72
+          max_lanes: 4
+          workers: 4
+      val:
+      - type: MyGenerateLaneLine
+        cfg:
+          data_root: data/CULane
+          batch_size: 24
+          ori_img_w: 1640
+          ori_img_h: 590
+          img_w: 800
+          img_h: 320
+          cut_height: 270
+          work_dirs: work_dirs/clr/r18_culane
+          img_norm:
+            mean:
+            - 103.939
+            - 116.779
+            - 123.68
+            std:
+            - 1.0
+            - 1.0
+            - 1.0
+          n_points: 72
+          max_lanes: 4
+          workers: 4
+        training: false
+        transforms: null
+      - type: ToTensor
+        keys:
+        - img
+        cfg:
+          data_root: data/CULane
+          batch_size: 24
+          ori_img_w: 1640
+          ori_img_h: 590
+          img_w: 800
+          img_h: 320
+          cut_height: 270
+          work_dirs: work_dirs/clr/r18_culane
+          img_norm:
+            mean:
+            - 103.939
+            - 116.779
+            - 123.68
+            std:
+            - 1.0
+            - 1.0
+            - 1.0
+          n_points: 72
+          max_lanes: 4
+          workers: 4
+      test: null
+model:
+  class_path: clrnet.engine.Runner
+  init_args:
+    backbone:
+      class_path: clrnet.models.ResNetWrapper
+      init_args:
+        resnet: resnet18
+        pretrained: true
+        replace_stride_with_dilation:
+        - false
+        - false
+        - false
+        out_conv: false
+        fea_stride: 8
+        out_channel: 128
+        in_channels:
+        - 64
+        - 128
+        - 256
+        - 512
+        cfg: null
+    neck:
+      class_path: clrnet.models.FPN
+      init_args:
+        in_channels:
+        - 128
+        - 256
+        - 512
+        out_channels: 64
+        num_outs: 3
+        start_level: 0
+        end_level: -1
+        add_extra_convs: false
+        extra_convs_on_inputs: true
+        relu_before_extra_convs: false
+        no_norm_on_lateral: false
+        conv_cfg: null
+        norm_cfg: null
+        attention: false
+        act_cfg: null
+        upsample_cfg:
+          mode: nearest
+        init_cfg:
+          type: Xavier
+          layer: Conv2d
+          distribution: uniform
+        cfg: null
+    heads:
+      class_path: clrnet.models.MyCLRHead
+      init_args:
+        cfg:
+          class_path: clrnet.models.MyCLRHeadParams
+          init_args:
+            sample_y:
+            - 589
+            - 569
+            - 549
+            - 529
+            - 509
+            - 489
+            - 469
+            - 449
+            - 429
+            - 409
+            - 389
+            - 369
+            - 349
+            - 329
+            - 309
+            - 289
+            - 269
+            - 249
+            - 229
+            log_interval: 1000
+            n_classes: 5
+            ignore_label: 255
+            bg_weight: 0.4
+            lr_update_by_epoch: false
+            iou_loss_weight: 2.0
+            cls_loss_weight: 2.0
+            xyt_loss_weight: 0.2
+            seg_loss_weight: 1.0
+            test_parameters:
+              conf_threshold: 0.4
+              nms_thres: 50
+              nms_topk: 4
+            n_priors: 192
+            refine_layers: 3
+            prior_fea_channels: 64
+            sample_points: 36
+            fc_hidden_dim: 64
+            max_lanes: 4
+        n_points: 72
+        n_fc: 2
+        ori_img_h: 1640
+        ori_img_w: 590

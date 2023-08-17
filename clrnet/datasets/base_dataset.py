@@ -26,7 +26,7 @@ class BaseDataset(Dataset):
           self.processes = Process(processes)
         else:
           self.processes = None
-          
+
     def view(self, predictions, img_metas):
         print("img_metas: ", img_metas)
         print("predictions: ", predictions)
@@ -36,7 +36,7 @@ class BaseDataset(Dataset):
         for img_meta in img_metas.data:
           for item in img_meta:
               img_metas.append(item)
-        
+
         for lanes, img_meta in zip(predictions, img_metas):
             img_name = img_meta['img_name']
             img = cv2.imread(osp.join(self.data_root, img_name))
@@ -53,14 +53,14 @@ class BaseDataset(Dataset):
         data_info = self.data_infos[idx]
         # print("get item, img_path: ", (data_info['img_path']))
         img = cv2.imread(data_info['img_path'], cv2.IMREAD_COLOR)
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        # img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         # img2 = torch.from_numpy(img_rgb)
         # print("img2.shape: ", img2.shape)
         # show_img(img2.permute(2, 0, 1), data_info['img_path'])
         # img = torch.from_numpy(img)
 
         # display_image_in_actual_size(img, data_info['img_path'])
-        
+
         img = img[self.cfg.cut_height:, :, :]
         sample = data_info.copy()
         sample.update({'img': img})
@@ -81,7 +81,7 @@ class BaseDataset(Dataset):
                         lanes.append((p[0], p[1] - self.cfg.cut_height))
                     new_lanes.append(lanes)
                 sample.update({'lanes': new_lanes})
-        
+
         if self.processes:
           sample = self.processes(sample)
         # print("base img min max: ", sample['img'].min(), sample['img'].max())

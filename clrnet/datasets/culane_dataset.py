@@ -2,12 +2,7 @@ import os
 import os.path as osp
 import numpy as np
 from .base_dataset import BaseDataset
-# import clrnet.utils.culane_metric as culane_metric
-import cv2
-from tqdm import tqdm
-import logging
 import pickle as pkl
-from torch.utils.data import Dataset
 import clrnet.utils.culane_metric as culane_metric
 
 LIST_FILE = {
@@ -55,7 +50,7 @@ class CULaneDataset(BaseDataset):
       for line in list_file:
         infos = self.load_annotation(line.split())
         self.data_infos.append(infos)
-  
+
     # cache data infos to file
     with open(cache_path, 'wb') as cache_file:
       pkl.dump(self.data_infos, cache_file)

@@ -61,7 +61,7 @@ class CULaneDataModule(pl.LightningDataModule):
 
     print('Done.')
     return
-  
+
   def view(self):
     return "view"
 
@@ -79,6 +79,7 @@ class CULaneDataModule(pl.LightningDataModule):
           # worker_init_fn=init_fn
           )
     item = next(iter(data_loader))
+    # print("item seg: ", item['seg'].shape)
     # print('img shape: ', item['img'].shape) # torch.Size([24, 3, 160, 400])
     # print('seg shape: ', item['seg'].shape) # torch.Size([24, 160, 400]) (bg=0, fg=1)
     # print('lane_line shape: ', item['lane_line'].shape) # torch.Size([24, 4, 78])
@@ -92,7 +93,7 @@ class CULaneDataModule(pl.LightningDataModule):
       }
     """
     # self.train_set.view(item[])
-    print('data_loader len:', len(data_loader))
+    print('data_loader len and seg shape:', len(data_loader), item['seg'].shape)
     return data_loader
 
   def val_dataloader(self):

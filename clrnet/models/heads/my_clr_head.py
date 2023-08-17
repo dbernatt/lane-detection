@@ -7,7 +7,7 @@ import torch.nn.functional as F
 # from torchvision.ops import nms
 
 from clrnet.models.utils.seg_decoder import SegDecoder
-from clrnet.models.utils.roi_gather import ROIGather
+from clrnet.models.utils.roi_gather import ROIGather, LinearModule
 from clrnet.models.losses.focal_loss import FocalLoss, SoftmaxFocalLoss
 from clrnet.models.losses.accuracy import accuracy
 from clrnet.ops import nms
@@ -16,7 +16,7 @@ from clrnet.models.losses.lineiou_loss import liou_loss
 from clrnet.utils.lane import Lane
 
 class MyCLRHeadParams(object):
-  def __init__(self, 
+  def __init__(self,
                sample_y,
                log_interval,
                n_classes,
@@ -61,16 +61,16 @@ class MyCLRHead(nn.Module):
   def __init__(self, cfg: MyCLRHeadParams,
                       n_points=72,
                       n_fc=2,
-                      img_w=400,
-                      img_h=160,
-                      ori_img_h=160,
-                      ori_img_w=400,
+                      img_w=800,
+                      img_h=320,
+                      ori_img_h=1640,
+                      ori_img_w=590,
                       max_lanes=4):
     print("Init MyCLRHead...")
     super(MyCLRHead, self).__init__()
-    
+
     self.cfg = cfg
-    self.img_w, self.img_h = img_w, img_h # 400, 160 
+    self.img_w, self.img_h = img_w, img_h # 400, 160
     self.n_points = n_points # 72
     # n_offsets: the horizontal distance between the prediction and its ground truth
     self.n_offsets = self.n_points # 72
@@ -85,22 +85,22 @@ class MyCLRHead(nn.Module):
     self.training = True
 
     # sample_x_indexes is a constant, which stores the random sample points x
-    self.register_buffer(name='sample_x_indexs', 
+    self.register_buffer(name='sample_x_indexs',
                          tensor=(
-                            torch.linspace(0, 1, 
-                                           steps=self.sample_points, # 36 
+                            torch.linspace(0, 1,
+                                           steps=self.sample_points, # 36
                                            dtype=torch.float32) * self.n_strips # 71
                          ).long()
                         )
 
     """
-      print(self.sample_x_indexs) 
+      print(self.sample_x_indexs)
       tensor([ 0,  2,  4,  6,  8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34,
          36, 38, 40, 42, 44, 46, 48, 50, 52, 54, 56, 58, 60, 62, 64, 66, 68, 71])
     """
 
     # noramlized sample_x_indexs or prior feature y points
-    self.register_buffer(name='prior_feat_ys', 
+    self.register_buffer(name='prior_feat_ys',
                          tensor=torch.flip(
                           (1 - self.sample_x_indexs.float() / self.n_strips), # 71
                           dims=[-1]
@@ -115,7 +115,7 @@ class MyCLRHead(nn.Module):
     """
 
     # sample prior y points from 1 to 0
-    self.register_buffer(name='prior_ys', 
+    self.register_buffer(name='prior_ys',
                          tensor=torch.linspace(1, 0,
                                                steps=self.n_offsets, # 72
                                                dtype=torch.float32
@@ -154,8 +154,8 @@ class MyCLRHead(nn.Module):
     lin_module = nn.ModuleList([nn.Linear(self.fc_hidden_dim, self.fc_hidden_dim),
                                 nn.ReLU(inplace=True)])
     for _ in range(n_fc):
-      reg_modules += [*lin_module]
-      cls_modules += [*lin_module]
+        reg_modules += [*LinearModule(self.fc_hidden_dim)]
+        cls_modules += [*LinearModule(self.fc_hidden_dim)]
     self.reg_modules = nn.ModuleList(cls_modules)
     self.cls_modules = nn.ModuleList(cls_modules)
 
@@ -170,7 +170,7 @@ class MyCLRHead(nn.Module):
     self.cls_layers = nn.Linear(self.fc_hidden_dim, 2)
 
 
-    # weights for each lane 
+    # weights for each lane
     weights = torch.ones(self.cfg.n_classes)
     weights[0] = self.cfg.bg_weight
 
@@ -189,9 +189,6 @@ class MyCLRHead(nn.Module):
 
     for m in self.reg_layers.parameters():
         nn.init.normal_(m, mean=0., std=1e-3)
-
-  def lane_prior(self):
-    pass
 
   def generate_priors_from_embeddings(self):
     predictions = self.prior_embeddings.weight  # (num_prop, 3)
@@ -253,7 +250,7 @@ class MyCLRHead(nn.Module):
     '''
     pool prior feature from feature map.
     Args:
-        batch_features (Tensor): Input feature maps, shape: (B, C, H, W) 
+        batch_features (Tensor): Input feature maps, shape: (B, C, H, W)
     '''
 
     batch_size = batch_features.shape[0]
@@ -296,7 +293,7 @@ class MyCLRHead(nn.Module):
 
     if self.training:
       self.priors, self.priors_on_featmap = self.generate_priors_from_embeddings()
-    
+
     priors, priors_on_featmap = self.priors.repeat(batch_size, 1,
                                                   1), self.priors_on_featmap.repeat(
                                                       batch_size, 1, 1)
@@ -376,7 +373,7 @@ class MyCLRHead(nn.Module):
         seg = self.seg_decoder(seg_features)
         output = {'predictions_lists': predictions_lists, 'seg': seg}
         # print("f out: ", output.keys())
-        # print("f out predictions_lists shape: ", 
+        # print("f out predictions_lists shape: ",
         # len(output['predictions_lists']))
         # print("f out seg: ", output['seg'])
         return self.loss(output, kwargs['batch'])
@@ -527,19 +524,24 @@ class MyCLRHead(nn.Module):
 
           cls_acc.append(sum(cls_acc_stage) / len(cls_acc_stage))
 
+
+      print("batch['seg'].long(): ", batch['seg'].long().shape)
+      m = nn.LogSoftmax(dim=1)
+      print("LogSoftmax: ", m(output['seg']).shape)
+
       # extra segmentation loss
-      # seg_loss = self.criterion(F.log_softmax(output['seg'], dim=1),
-      #                       batch['seg'].long())
+      seg_loss = self.criterion(F.log_softmax(output['seg'], dim=1),
+                                batch['seg'].long())
+      print("seg_loss.shape: ", seg_loss.shape)
 
       cls_loss /= (len(targets) * self.refine_layers)
       reg_xytl_loss /= (len(targets) * self.refine_layers)
       iou_loss /= (len(targets) * self.refine_layers)
 
-      # loss = cls_loss * cls_loss_weight + reg_xytl_loss * xyt_loss_weight \
-      #     + seg_loss * seg_loss_weight + iou_loss * iou_loss_weight
+      loss = cls_loss * cls_loss_weight + reg_xytl_loss * xyt_loss_weight + seg_loss * seg_loss_weight + iou_loss * iou_loss_weight
 
-      loss = cls_loss * cls_loss_weight + reg_xytl_loss * xyt_loss_weight \
-          + iou_loss * iou_loss_weight
+    #   loss = cls_loss * cls_loss_weight + reg_xytl_loss * xyt_loss_weight \
+    #       + iou_loss * iou_loss_weight
 
       return_value = {
           'loss': loss,
@@ -547,7 +549,7 @@ class MyCLRHead(nn.Module):
               'loss': loss,
               'cls_loss': cls_loss * cls_loss_weight,
               'reg_xytl_loss': reg_xytl_loss * xyt_loss_weight,
-              # 'seg_loss': seg_loss * seg_loss_weight,
+              'seg_loss': seg_loss * seg_loss_weight,
               'iou_loss': iou_loss * iou_loss_weight
           }
       }
@@ -640,4 +642,3 @@ class MyCLRHead(nn.Module):
 
 
 
-    

@@ -18,9 +18,7 @@ class Process(object):
     for process in processes:
         if isinstance(process, dict):
             print('process: ', process)
-            assert len(list(process.keys())) == 1
-            key = list(process.keys())[0]
-            process = build_from_cfg(process[key],
+            process = build_from_cfg(process,
                                       PROCESS,
                                       default_args=None)
             self.processes.append(process)
